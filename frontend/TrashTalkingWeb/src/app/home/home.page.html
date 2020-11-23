@@ -1,0 +1,29 @@
+<ion-header [translucent]="true">
+  <ion-toolbar>
+    <ion-title>
+      TrashTalking
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-header collapse="condense">
+    <ion-toolbar>
+      <ion-title size="large">Login/Sign Up</ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+  <div id="container">
+    <strong>Login or Sign Up</strong>
+    <ion-item>
+      <ion-label>Username</ion-label>
+      <ion-input [(ngModel)]="email" placeholder="email"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Password</ion-label>
+      <ion-input [(ngModel)]="password" placeholder="password" type="password"></ion-input>
+    </ion-item>
+    <ion-button (click)="onLogin()" color="primary">Log In</ion-button>
+    <ion-button [routerLink]="['/signup']" color="primary">Sign Up</ion-button>
+  </div>
+</ion-content>
