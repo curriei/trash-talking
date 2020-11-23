@@ -11,8 +11,8 @@ import { environment } from '../environments/environment';
 import { AuthenticationService } from './authentication-service';
 import { AngularFirestoreModule } from '@angular/fire/firestore';
 import { AngularFireDatabaseModule } from '@angular/fire/database';
-
-
+import { NgxChartsModule }from '@swimlane/ngx-charts';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { GarbageService } from './crud-service2';
@@ -21,7 +21,7 @@ import { GarbageService } from './crud-service2';
   declarations: [AppComponent],
   entryComponents: [],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, AngularFireModule.initializeApp(environment.firebaseConfig),
-    AngularFireAuthModule, AngularFirestoreModule],
+    AngularFireAuthModule, AngularFirestoreModule, BrowserAnimationsModule, NgxChartsModule],
   providers: [
     AuthenticationService,
     GarbageService,

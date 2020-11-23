@@ -1,0 +1,41 @@
+<ion-menu side="start" menuId="custom" contentId="main" class="my-custom-menu">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>Menu</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-list>
+      <ion-item><a [routerLink]="['/main']">Main</a></ion-item>
+      <ion-item><a [routerLink]="['/goals']">Goals</a></ion-item>
+      <ion-item><a [routerLink]="['/main']">Log Out</a></ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<div id=main>
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>
+        TrashTalking
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+    <ion-content [fullscreen]="true">
+    <div id="container">
+    <img src="assets/images/trashcanicon.png" width="120" height="120">
+    <h1>Welcome back {{ this.fname }}!</h1>
+    <h2>Profile Information</h2>
+    <p><b>Name:</b> {{ this.fname }} {{ this.lname }}</p>
+    <p><b>Email:</b> {{ this.email }}</p>
+    <p><b>Date Joined:</b> {{ this.date_joined }}</p>
+  </div>
+  </ion-content>
+</div>

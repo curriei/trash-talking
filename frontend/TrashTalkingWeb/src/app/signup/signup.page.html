@@ -16,7 +16,15 @@
   <div id="container">
     <strong>Sign Up</strong>
     <ion-item>
-      <ion-label>Username</ion-label>
+      <ion-label>First Name</ion-label>
+      <ion-input [(ngModel)]="fname" placeholder="first name"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Last Name</ion-label>
+      <ion-input [(ngModel)]="lname" placeholder="last name"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Email</ion-label>
       <ion-input [(ngModel)]="email" placeholder="email"></ion-input>
     </ion-item>
     <ion-item>

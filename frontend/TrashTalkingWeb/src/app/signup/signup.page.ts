@@ -9,13 +9,15 @@ import { AuthenticationService } from '../authentication-service';
 export class SignUpPage {
   email: string;
   password: string;
+  fname: string;
+  lname: string;
 
   constructor(private authService: AuthenticationService) {}
 
   onSignUp() {
     console.log(this.email);
     console.log(this.password);
-    this.authService.RegisterUser(this.email, this.password)
+    this.authService.RegisterUser(this.email, this.password, this.fname, this.lname, "November 23rd, 2020")
   }
 
 }
