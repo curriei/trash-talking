@@ -1,6 +1,8 @@
-import { Injectable } from '@angular/core';
+import { Injectable, ɵCompiler_compileModuleSync__POST_R3__ } from '@angular/core';
 import { Router } from "@angular/router";
+import User from './User';
 import { AngularFireAuth } from "@angular/fire/auth";
+import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 
 @Injectable({
   providedIn: 'root'
@@ -8,10 +10,14 @@ import { AngularFireAuth } from "@angular/fire/auth";
 
 export class AuthenticationService {
   userData: any;
+  private dbPath = '/users';
+
+  userRef: AngularFirestoreCollection<User> = null;
 
   constructor(
     public ngFireAuth: AngularFireAuth,
-    public router: Router
+    public router: Router,
+    private db: AngularFirestore
   ) {
     this.ngFireAuth.authState.subscribe(user => {
       if (user) {
@@ -23,6 +29,7 @@ export class AuthenticationService {
         JSON.parse(localStorage.getItem('user'));
       }
     })
+    this.userRef = db.collection(this.dbPath);
   }
 
   // Login in with email/password
@@ -31,7 +38,13 @@ export class AuthenticationService {
   }
 
   // Register user with email/password
-  RegisterUser(email, password) {
+  RegisterUser(email, password, fname, lname, date_joined) {
+    var user = new User();
+    user.Date_Joined = date_joined;
+    user.email = email;
+    user.First_name = fname;
+    user.Last_name = lname;
+    this.userRef.add({ ...user });
     return this.ngFireAuth.createUserWithEmailAndPassword(email, password)
   }
 

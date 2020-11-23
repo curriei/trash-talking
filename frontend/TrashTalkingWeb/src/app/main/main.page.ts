@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
+import { MenuController } from '@ionic/angular';
 import { GarbageService } from '../crud-service2';
 import { map } from 'rxjs/operators';
+import { Router } from '@angular/router';
 import * as CanvasJS from '../canvasjs.min';
 import Garbage from '../garbage';
 
@@ -11,10 +13,53 @@ import Garbage from '../garbage';
 })
 export class MainPage {
   entries: any;
+  chartData: any = null;
   email: string;
   password: string;
+  chartType: string = 'bar';
+  saleData = [
+    { name: "Mobiles", value: 105000 },
+    { name: "Laptop", value: 55000 },
+    { name: "AC", value: 15000 },
+    { name: "Headset", value: 150000 },
+    { name: "Fridge", value: 20000 }
+  ];
+  chartData2 = [
+    {
+      "name": "Nov 15-21",
+      "series": [
+        {
+          "name": "Sunday",
+          "value": 5
+        },
+        {
+          "name": "Monday",
+          "value": 10
+        },
+        {
+          "name": "Tuesday",
+          "value": 8
+        },
+        {
+          "name": "Wednesday",
+          "value": 17
+        },
+        {
+          "name": "Thursday",
+          "value": 12
+        },
+        {
+          "name": "Friday",
+          "value": 9
+        },
+        {
+          "name": "Saturday",
+          "value": 10
+        }
+      ]
+    }]
 
-  constructor(private crudService: GarbageService) {}
+  constructor(private router: Router, private menu: MenuController, private crudService: GarbageService) {}
 
   ngOnInit() {
     this.crudService.getAll().snapshotChanges().pipe(
@@ -25,23 +70,16 @@ export class MainPage {
       )
     ).subscribe(data => {
       this.entries = data;
-      let chart = new CanvasJS.Chart("chartContainer", {
-        animationEnabled: true,
-        exportEnabled: true,
-        title: {
-          text: "Garbage Usage for Jan-March"
-        },
-        data: [{
-          type: "column",
-          dataPoints: [
-            { y: this.entries[0]["total_garbage"], label: "January" },
-            { y: this.entries[1]["total_garbage"], label: "February" },
-            { y: this.entries[2]["total_garbage"], label: "March" }
-          ]
-        }]
-      });
-      chart.render();
+      this.chartData = [
+        {name: "January", value: this.entries[0]["total_garbage"]},
+        {name: "February", value: this.entries[1]["total_garbage"]},
+        {name: "March", value: this.entries[2]["total_garbage"]}
+      ];
     });
+  }
+  openCustom() {
+    this.menu.enable(true, 'custom');
+    this.menu.open('custom');
   }
 
   onGetData() {

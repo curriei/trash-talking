@@ -1,0 +1,52 @@
+<ion-menu side="start" menuId="custom" contentId="main" class="my-custom-menu">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>Menu</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-list>
+      <ion-item><a [routerLink]="['/main']">Main</a></ion-item>
+      <ion-item><a [routerLink]="['/goals']">Goals</a></ion-item>
+      <ion-item><a [routerLink]="['/home']">Log Out</a></ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<div id=main>
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>
+        TrashTalking
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+    <ion-content [fullscreen]="true">
+    <div id="container">
+    <strong>Goals</strong>
+    <ion-item>
+    <ion-label>Goal Description</ion-label>
+    <ion-input [(ngModel)]="desc" placeholder="I want to reduce trash weight by 5 lbs"></ion-input>
+    </ion-item>
+    <ion-item>
+      <ion-label>Due Date</ion-label>
+      <ion-datetime [(ngModel)]="duedate"></ion-datetime>
+    </ion-item>
+    <ion-button (click)="onAddGoal()" color="primary">Add Goal</ion-button>
+    <h1>Current Goals</h1>
+    <p *ngIf="goals == null || goals.length == 0">You haven't set any goals yet.</p>
+    <ion-list *ngFor="let goal of goals">
+      <ion-item>
+        {{goal.goal}}, {{goal.date}}
+    </ion-item>
+    </ion-list>
+  </div>
+  </ion-content>
+</div>

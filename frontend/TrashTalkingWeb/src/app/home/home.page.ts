@@ -9,6 +9,7 @@ import { Router } from '@angular/router';
 export class HomePage {
   email: string;
   password: string;
+  login: string = "success";
 
   constructor(private authService: AuthenticationService, private router: Router) {}
 
@@ -17,7 +18,7 @@ export class HomePage {
     console.log(this.password);
     this.authService.SignIn(this.email, this.password).then(() => {
       this.router.navigate(['/main'])
-    }).catch(() => console.log("Wrong credentials"));
+    }).catch(() => this.login = "fail");
   }
 
 }

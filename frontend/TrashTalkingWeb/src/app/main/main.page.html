@@ -1,19 +1,74 @@
-<ion-header [translucent]="true">
-  <ion-toolbar>
-    <ion-title>
-      TrashTalking
-    </ion-title>
-  </ion-toolbar>
-</ion-header>
+<ion-menu side="start" menuId="custom" contentId="main" class="my-custom-menu">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>Menu</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-list>
+      <ion-item><a [routerLink]="['/profile']">Profile</a></ion-item>
+      <ion-item><a [routerLink]="['/goals']">Goals</a></ion-item>
+      <ion-item><a [routerLink]="['/home']">Log Out</a></ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
 
-<ion-content [fullscreen]="true">
-  <ion-header collapse="condense">
+<div id=main>
+  <ion-header [translucent]="true">
     <ion-toolbar>
-      <ion-title size="large">Main Page!</ion-title>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>
+        TrashTalking
+      </ion-title>
     </ion-toolbar>
   </ion-header>
 
-  <div id="container">
-    <div id="chartContainer" style="height: 370px; width: 100%;"></div>
-  </div>
-</ion-content>
+  <ion-content [fullscreen]="true">
+    <div id="container" *ngIf="chartData.length > 0">
+      <div *ngIf="chartType == 'bar'">
+      <h1>Monthly Garbage Statistics</h1>
+      <ngx-charts-bar-vertical
+      [view]="[1000,400]"
+      [results]="chartData"
+      [xAxisLabel]="'Month'"
+      [legendTitle]="'Month Colour Chart'"
+      [yAxisLabel]="'Total Garbage (lbs)'"
+      [legend]="true"
+      [showXAxisLabel]="true"
+      [showYAxisLabel]="true"
+      [xAxis]="true"
+      [yAxis]="true"
+      [gradient]="true">
+      </ngx-charts-bar-vertical>
+    </div>
+    <div *ngIf="chartType == 'line'">
+      <h1>Daily Garbage Statistics</h1>
+      <ngx-charts-line-chart
+      [view]="[1000,400]"
+      [results]="chartData2"
+      [xAxisLabel]="'Day of the Week'"
+      [legendTitle]="'Week Colour Chart'"
+      [yAxisLabel]="'Total Garbage (lbs)'"
+      [legend]="true"
+      [showXAxisLabel]="true"
+      [showYAxisLabel]="true"
+      [xAxis]="true"
+      [yAxis]="true"
+      [gradient]="true">
+      </ngx-charts-line-chart>
+    </div>
+    </div>
+    <ion-item>
+      <ion-label>Statistic Type</ion-label>
+      <ion-select [(ngModel)]="chartType" placeholder="Select a Type">
+        <ion-select-option value="bar">Monthly</ion-select-option>
+        <ion-select-option value="line">Daily</ion-select-option>
+      </ion-select>
+    </ion-item>
+  </ion-content>
+</div>
