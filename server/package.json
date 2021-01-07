@@ -4,12 +4,16 @@
   "description": "Server for trash talking",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "start": "nodemon index.js"
   },
   "author": "Ian Currie",
   "license": "ISC",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "firebase-admin": "^9.4.2",
+    "firestore-schema": "^1.2.0-beta.3"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "nodemon": "^2.0.7"
+  }
 }

@@ -6,6 +6,7 @@ const bodyParser = require('body-parser');
 const binsRoutes = require('./routes/bins.js');
 const userRoutes = require('./routes/users.js');
 
+//App initialization
 const app = express();
 app.use(bodyParser.json());
 
@@ -15,6 +16,7 @@ app.use('/bins', binsRoutes);
 
 //Port listening
 const port = process.env.PORT || 8080;
+
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
