@@ -2,6 +2,7 @@
   "name": "trash-talking-server",
   "version": "1.0.0",
   "description": "Server for trash talking",
+  "repository": "https://github.com/curriei/trash-talking.git",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
