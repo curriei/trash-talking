@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "local-start": "nodemon index.js"
+    "test": "nodemon index.js"
   },
   "author": "Ian Currie",
   "license": "ISC",

@@ -24,7 +24,7 @@ const createUser = async (req, res) => {
 const getUser = async (req, res) => {
     const {user_name} = req.params;
     const docRef = db.collection('users').doc(user_name);
-    const user = await docRef.get(user_name);
+    const user = await docRef.get();
     if (!user.exists) {
         res.send("User does not exist");
     } else {
