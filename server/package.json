@@ -4,7 +4,8 @@
   "description": "Server for trash talking",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js",
+    "local-start": "nodemon index.js"
   },
   "author": "Ian Currie",
   "license": "ISC",

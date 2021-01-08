@@ -14,7 +14,7 @@
       {
         "source": "**",
         "run": {
-          "serviceId": "test",
+          "serviceId": "trash-talking",
           "region": "us-central1"
         }
       }

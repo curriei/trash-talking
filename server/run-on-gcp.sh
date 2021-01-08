@@ -1,8 +1,8 @@
 #!/bin/bash
-# run-oon-gcp.sh
+# run-on-gcp.sh
 
 PROJECT_ID="trashtalking-96ed8"
-BUILD_NAME="test"
+BUILD_NAME="trash-talking"
 
 gcloud builds submit --tag gcr.io/${PROJECT_ID}/${BUILD_NAME}
 
