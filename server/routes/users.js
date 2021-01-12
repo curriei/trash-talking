@@ -1,9 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const users_controllers = require('../controllers/users.js');
+const usersControllers = require('../controllers/users.js');
+const auth = require('../controllers/auth.js');
 
 //Users Routes
-router.post('/', users_controllers.createUser);
-router.get('/:user_name', users_controllers.getUser);
+router.post('/new', auth.createUser);
+router.post('/login', auth.loginUser);
+router.get('/test', auth.verifyToken, (req, res) => {
+    console.log(req.uid);
+    res.send('Private request');
+});
+router.get('/:user_name', usersControllers.getUser);
 
 module.exports = router;

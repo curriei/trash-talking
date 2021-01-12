@@ -3,27 +3,27 @@ const {db} = require('../fb.js');
 
 const registerBin = async (req, res) => {
     //Json manipulation
-    const body_json = req.body;
-    let bin_id = body_json.id;
-    if (bin_id === undefined) {
-        bin_id = uuidv4();
+    const body = req.body;
+    let binId = body.id;
+    if (binId === undefined) {
+        binId = uuidv4();
     }
-    const user_name = body_json.user_name;
-    const bin_area = Math.pow((body_json.diameter / 2.0), 2) * Math.PI;
-    const weight = body_json.weight;
-    const distance = body_json.distance;
+    const userName = body.userName;
+    const bin_area = Math.pow((body.diameter / 2.0), 2) * Math.PI;
+    const weight = body.weight;
+    const distance = body.distance;
 
     //Update firebase
-    const docRef = db.collection('bins').doc(bin_id);
+    const docRef = db.collection('bins').doc(binId);
     await docRef.set({
-        user: user_name,
+        user: userName,
         last_weight: weight,
         last_distance: distance,
         bin_area: bin_area
     });
 
-    console.log(`Bin with ID ${bin_id} added.`);
-    res.send(`Bin with ID ${bin_id} added.`);
+    console.log(`Bin with ID ${binId} added.`);
+    res.status(200).send(`Bin with ID ${binId} added.`);
 };
 
 const binUpdate = async (req, res) => {
@@ -37,10 +37,11 @@ const binUpdate = async (req, res) => {
     const date = body_json.date;
 
     //Compare absolutes for delta
-    const bin = await db.collection('bins').doc(bin_id).get();
+    const binDocRef = db.collection('bins').doc(bin_id);
+    const bin = await binDocRef.get();
 
     if (!bin.exists) {
-        res.send("Bin does not exist");
+        res.status(404).send("Bin does not exist");
         return
     }
     const delta_weight = weight - bin.data().last_weight;
@@ -58,11 +59,16 @@ const binUpdate = async (req, res) => {
             time: time,
             date: date
         });
-        res.send(`${delta_weight} weight added for bin: ${bin_id}`);
+        await binDocRef.update({
+            last_weight: weight,
+            last_distance: distance
+        });
+        res.status(200).send(`${delta_weight} weight added for bin: ${bin_id}`);
     } else {
-        res.send('Bag removed, no garbage recorded.');
+        res.status(200).send('Bag removed, no garbage recorded.');
     }
 
+    //Update last update values for bin.
     const docRef = db.collection('bins').doc(bin_id);
     await docRef.update({
         last_distance: distance,
