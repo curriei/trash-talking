@@ -5,6 +5,7 @@ require('dotenv').config();
 //Internal imports
 const binsRoutes = require('./routes/bins.js');
 const userRoutes = require('./routes/users.js');
+const garbageRoutes = require('./routes/garbage.js');
 
 //App initialization
 const app = express();
@@ -16,6 +17,7 @@ app.use(express.urlencoded({
 //Routing categories
 app.use('/users', userRoutes);
 app.use('/bins', binsRoutes);
+app.use('/garbage', garbageRoutes);
 
 //Port listening
 const port = process.env.PORT || 8080;

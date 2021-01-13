@@ -1,5 +1,5 @@
 const uuidv4 = require('uuid').v4;
-const {db} = require('../fb.js');
+const {db} = require('../firebase/fb.js');
 
 const registerBin = async (req, res) => {
     //Json manipulation
@@ -17,9 +17,11 @@ const registerBin = async (req, res) => {
     const docRef = db.collection('bins').doc(binId);
     await docRef.set({
         user: userName,
-        last_weight: weight,
+        last_weight: 0,
         last_distance: distance,
-        bin_area: bin_area
+        bin_area: bin_area,
+        bin_weight: weight,
+        bin_distance: distance
     });
 
     console.log(`Bin with ID ${binId} added.`);
@@ -44,7 +46,7 @@ const binUpdate = async (req, res) => {
         res.status(404).send("Bin does not exist");
         return
     }
-    const delta_weight = weight - bin.data().last_weight;
+    const delta_weight = weight - bin.data().last_weight - bin.data().bin_weight;
     // Negative because distance is measured from top of bin.
     const delta_distance = bin.data().last_distance - distance;
     const delta_volume = delta_distance * bin.data().bin_area;
@@ -59,21 +61,36 @@ const binUpdate = async (req, res) => {
             time: time,
             date: date
         });
-        await binDocRef.update({
-            last_weight: weight,
-            last_distance: distance
-        });
         res.status(200).send(`${delta_weight} weight added for bin: ${bin_id}`);
     } else {
         res.status(200).send('Bag removed, no garbage recorded.');
     }
 
     //Update last update values for bin.
-    const docRef = db.collection('bins').doc(bin_id);
-    await docRef.update({
+    await binDocRef.update({
         last_distance: distance,
-        last_weight: weight
+        last_weight: weight - bin.data().bin_weight
     });
 };
 
-module.exports = {registerBin, binUpdate};
+const current = async (req, res) => {
+    const uid = req.uid.uid;
+    const binId = req.body.binId;
+
+    const bin = await db.collection('bins').doc(binId).get();
+    if (!bin.exists) {
+        return res.status(404).send("Bin does not exist");
+    }
+    if (bin.user !== uid) {
+        return res.status(403).send('Bin does not belong to this user.');
+    }
+    const currentWeight = bin.last_weight;
+    const currentVolume = (bin.bin_distance - bin.last_distance) * bin.bin_area;
+
+    res.status(200).json({
+        currentWeight: currentWeight,
+        currentVolume: currentVolume,
+    });
+};
+
+module.exports = {registerBin, binUpdate, current};

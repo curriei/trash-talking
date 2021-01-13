@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {admin} = require('../fb.js');
+const {admin} = require('../firebase/fb.js');
 const axios = require('axios');
 
 
@@ -7,7 +7,7 @@ const createUser = async (req, res) => {
 
     //Json manipulation
     const body = req.body;
-    const displayName = body.displayName;
+    const displayName = body.username;
     const email = body.email;
     const password = body.password;
 
@@ -41,7 +41,7 @@ const loginUser = (req, res) => {
         password: req.body.password
     })
         .then(response => {
-            console.log(response);
+            console.log(response.data);
             const token = jwt.sign({uid: response.data.localId}, process.env.TOKEN_SECRET);
             res.status(200).json({
                 action: "Success",
