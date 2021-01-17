@@ -4,7 +4,7 @@
 PROJECT_ID="trashtalking-96ed8"
 BUILD_NAME="trash-talking"
 
-gcloud builds submit --tag gcr.io/${PROJECT_ID}/${BUILD_NAME}
+gcloud builds submit --tag gcr.io/${PROJECT_ID}/${BUILD_NAME} .
 
 echo "+----------------------------------------------------------------------+"
 echo "|                       BUILD COMPLETED                                |"

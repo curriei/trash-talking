@@ -59,6 +59,4 @@ const newGoal = async (req, res) => {
     res.status(200).send('Goal successfully set');
 };
 
-//TODO: Update and complete goals.
-
 module.exports = {getUser, getGoals, getBins, newGoal};
