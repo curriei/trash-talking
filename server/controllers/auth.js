@@ -7,11 +7,13 @@ const createUser = async (req, res) => {
 
     //Json manipulation
     const body = req.body;
-    const displayName = body.username;
+    const username = body.user_id;
+    const displayName = body.name;
     const email = body.email;
     const password = body.password;
 
     admin.auth().createUser({
+        uid: username,
         email: email,
         emailVerified: false,
         password: password,
@@ -23,13 +25,13 @@ const createUser = async (req, res) => {
                 console.log("New user created:", userRecord.uid);
                 res.status(200).json({
                     action: "Success",
-                    description: `User ${displayName} created.`
+                    description: `User ${username} created.`
                 });
             })
         .catch(
             (error) => {
                 console.log(`Error creating new user:`, error);
-                res.status(400).send(error);
+                res.status(400).send(`Error creating new user: ${error}`);
             }
         );
 };
@@ -57,7 +59,7 @@ const loginUser = (req, res) => {
 
 const verifyToken = (req, res, next) => {
     const token = req.body.token;
-    if (!token) return res.status(401).send('Access Denied');
+    if (!token) return res.status(401).send('No token specified. Access denied.');
 
     try {
         req.uid = jwt.verify(token, process.env.TOKEN_SECRET);
@@ -67,4 +69,12 @@ const verifyToken = (req, res, next) => {
     }
 };
 
-module.exports = {createUser, verifyToken, loginUser};
+const verifyAdmin = (req, res, next) => {
+    const adminPassword = req.body.admin_password;
+    if (!adminPassword) return res.status(401).send("No admin_password specified. Access denied.");
+
+    if (adminPassword === process.env.ADMIN_PASSWORD) next();
+    else res.status(400).send('Incorrect password');
+};
+
+module.exports = {createUser, verifyToken, loginUser, verifyAdmin};

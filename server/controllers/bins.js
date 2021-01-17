@@ -1,27 +1,39 @@
 const uuidv4 = require('uuid').v4;
 const {db} = require('../firebase/fb.js');
 
+const createBin = async (req, res) => {
+    const body = req.body;
+    let binArea = body.bin_area;
+    if (binArea === undefined)
+        binArea = Math.pow((body.diameter / 2.0), 2) * Math.PI;
+
+    const binId = uuidv4();
+    await db.collection('bins').doc(binId).set({
+        activated: false,
+        bin_area: binArea
+    });
+    console.log('Bin created with ID:', binId);
+    res.status(200).send(`Bin created with ID: ${binId}`);
+};
+
 const registerBin = async (req, res) => {
     //Json manipulation
     const body = req.body;
-    let binId = body.id;
-    if (binId === undefined) {
-        binId = uuidv4();
-    }
-    const userName = body.userName;
-    const bin_area = Math.pow((body.diameter / 2.0), 2) * Math.PI;
-    const weight = body.weight;
-    const distance = body.distance;
+    const binId = body.bin_id;
+    const binRef = db.collection('bins').doc(binId);
+
+    //Check if bin was created.
+    const bin = await binRef.get();
+    if (!bin.exists) return res.status(400).send("Bin does not exist.");
+    if (bin.data().activated === true) return res.status(400).send('Bin has already been registered.');
+
+    //Register bin.
+    const uid = req.uid.uid;
 
     //Update firebase
-    const docRef = db.collection('bins').doc(binId);
-    await docRef.set({
-        user: userName,
-        last_weight: 0,
-        last_distance: distance,
-        bin_area: bin_area,
-        bin_weight: weight,
-        bin_distance: distance
+    await binRef.update({
+        user_id: uid,
+        activated: true
     });
 
     console.log(`Bin with ID ${binId} added.`);
@@ -32,65 +44,93 @@ const binUpdate = async (req, res) => {
     //Json Manipulation
     const update_id = uuidv4();
     const body_json = req.body;
-    const {bin_id} = req.params;
+    const binId = body_json.bin_id;
     const weight = body_json.weight;
     const distance = body_json.distance;
-    const time = body_json.time;
-    const date = body_json.date;
+    const date = new Date().toJSON();
 
-    //Compare absolutes for delta
-    const binDocRef = db.collection('bins').doc(bin_id);
-    const bin = await binDocRef.get();
-
+    //Get bin data and check if exists
+    let binDocRef;
+    let bin;
+    try {
+        binDocRef = db.collection('bins').doc(binId);
+        bin = await binDocRef.get();
+    } catch (e) {
+        return res.status(400).send(`Error accessing database: ${e}`);
+    }
     if (!bin.exists) {
-        res.status(404).send("Bin does not exist");
+        res.status(400).send("Bin does not exist");
         return
     }
-    const delta_weight = weight - bin.data().last_weight - bin.data().bin_weight;
+
+    //Update bin data, including checking if bin has had any updates in the past yet.
+    let lastWeight = bin.data().last_weight;
+    let lastDistance = bin.data().last_distance;
+    if (lastWeight === undefined) {
+        binDocRef.update({
+            last_weight: weight,
+            last_distance: distance,
+            bin_weight: weight,
+            bin_distance: distance,
+            last_update: date
+        });
+        lastDistance = distance;
+        lastWeight = weight;
+    } else {
+        binDocRef.update({
+            last_weight: weight,
+            last_distance: distance,
+            last_update: date
+        })
+    }
+
+    //Calculate delta values for garbage update.
+    const deltaWeight = weight - lastWeight;
     // Negative because distance is measured from top of bin.
-    const delta_distance = bin.data().last_distance - distance;
-    const delta_volume = delta_distance * bin.data().bin_area;
+    const deltaDistance = lastDistance - distance;
+    const deltaVolume = deltaDistance * bin.data().bin_area;
 
     // Only record a garbage update if garbage was added (avoid bag removal)
-    if (delta_weight >= 0) {
+    if (deltaWeight >= 0) {
         const docRef = db.collection('data-entries').doc(update_id);
         await docRef.set({
-            bin_id: bin_id,
-            weight: delta_weight,
-            volume: delta_volume,
-            time: time,
+            bin_id: binId,
+            weight: deltaWeight,
+            volume: deltaVolume,
             date: date
         });
-        res.status(200).send(`${delta_weight} weight added for bin: ${bin_id}`);
+        res.status(200).send(`${deltaWeight} weight added for bin: ${binId}`);
     } else {
         res.status(200).send('Bag removed, no garbage recorded.');
     }
-
-    //Update last update values for bin.
-    await binDocRef.update({
-        last_distance: distance,
-        last_weight: weight - bin.data().bin_weight
-    });
 };
 
 const current = async (req, res) => {
     const uid = req.uid.uid;
-    const binId = req.body.binId;
+    const binId = req.body.bin_id;
 
     const bin = await db.collection('bins').doc(binId).get();
+
+    //Check if bin exists
     if (!bin.exists) {
-        return res.status(404).send("Bin does not exist");
+        return res.status(400).send("Bin does not exist");
     }
-    if (bin.user !== uid) {
-        return res.status(403).send('Bin does not belong to this user.');
+    //Check if bin has any data relating to it
+    if (bin.data().bin_weight === undefined) {
+        return res.status(400).send("Bin has never been updated.");
     }
-    const currentWeight = bin.last_weight;
-    const currentVolume = (bin.bin_distance - bin.last_distance) * bin.bin_area;
+    //Check if bin matches registered user.
+    if (bin.data().user_id !== uid) {
+        return res.status(400).send('Bin does not belong to this user.');
+    }
+    const currentWeight = bin.data().last_weight - bin.data().bin_weight;
+    const currentVolume = (bin.data().bin_distance - bin.data().last_distance) * bin.data().bin_area;
 
     res.status(200).json({
-        currentWeight: currentWeight,
-        currentVolume: currentVolume,
+        current_weight: currentWeight,
+        current_volume: currentVolume,
+        last_updated: bin.data().last_update
     });
 };
 
-module.exports = {registerBin, binUpdate, current};
+module.exports = {registerBin, createBin, binUpdate, current};
