@@ -7,13 +7,13 @@ const createUser = async (req, res) => {
 
     //Json manipulation
     const body = req.body;
-    const username = body.user_id;
+    const user_id = body.user_id;
     const displayName = body.name;
     const email = body.email;
     const password = body.password;
 
     admin.auth().createUser({
-        uid: username,
+        uid: user_id,
         email: email,
         emailVerified: false,
         password: password,
@@ -31,7 +31,7 @@ const createUser = async (req, res) => {
         .catch(
             (error) => {
                 console.log(`Error creating new user:`, error);
-                res.status(400).send(`Error creating new user: ${error}`);
+                res.status(400).send(`${error}`);
             }
         );
 };

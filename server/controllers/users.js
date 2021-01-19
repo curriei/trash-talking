@@ -52,8 +52,8 @@ const newGoal = async (req, res) => {
     goalDoc.set({
         user_id: uid,
         goal_desc: req.body.goal_desc,
-        date_made: new Date().toJSON(),
-        date_due: req.body.date_due,
+        time_made: new Date().getTime(),
+        time_due: new Date(parseInt(req.body.time_due)).getTime(),
         status: 'Incomplete'
     });
     res.status(200).send('Goal successfully set');

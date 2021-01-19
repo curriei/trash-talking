@@ -47,7 +47,7 @@ const binUpdate = async (req, res) => {
     const binId = body_json.bin_id;
     const weight = body_json.weight;
     const distance = body_json.distance;
-    const date = new Date().toJSON();
+    const timeStamp = new Date().getTime();
 
     //Get bin data and check if exists
     let binDocRef;
@@ -72,7 +72,7 @@ const binUpdate = async (req, res) => {
             last_distance: distance,
             bin_weight: weight,
             bin_distance: distance,
-            last_update: date
+            last_update: timeStamp
         });
         lastDistance = distance;
         lastWeight = weight;
@@ -80,7 +80,7 @@ const binUpdate = async (req, res) => {
         binDocRef.update({
             last_weight: weight,
             last_distance: distance,
-            last_update: date
+            last_update: timeStamp
         })
     }
 
@@ -97,7 +97,7 @@ const binUpdate = async (req, res) => {
             bin_id: binId,
             weight: deltaWeight,
             volume: deltaVolume,
-            date: date
+            time_stamp: timeStamp
         });
         res.status(200).send(`${deltaWeight} weight added for bin: ${binId}`);
     } else {
@@ -126,10 +126,21 @@ const current = async (req, res) => {
     const currentWeight = bin.data().last_weight - bin.data().bin_weight;
     const currentVolume = (bin.data().bin_distance - bin.data().last_distance) * bin.data().bin_area;
 
+    const date = new Date(bin.data().last_update);
     res.status(200).json({
         current_weight: currentWeight,
         current_volume: currentVolume,
-        last_updated: bin.data().last_update
+        last_update: {
+            year: date.getFullYear(),
+            month: date.getMonth(),
+            date: date.getDate(),
+            day: date.getDay(),
+            hour: date.getHours(),
+            minute: date.getMinutes(),
+            second: date.getSeconds(),
+            time_stamp: date.getTime(),
+            time_zone_offset: date.getTimezoneOffset()
+        }
     });
 };
 
