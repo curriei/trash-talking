@@ -12,7 +12,7 @@ const getUser = async (req, res) => {
             });
         })
         .catch((error) => {
-            res.status(404).send(error);
+            res.status(400).send(error);
         });
 };
 
@@ -34,10 +34,9 @@ const getBins = async (req, res) => {
 const getGoals = async (req, res) => {
     const uid = req.uid.uid;
     const goalQuery = await db.collection('goals').where('user_id', '==', uid).get();
-    let result = [];
+    let result = {};
     goalQuery.forEach(goal => {
-        console.log(goal);
-        result.push(goal.data())
+        result[goal.id] = goal.data()
     });
     res.status(200).json({
         num_goals: result.length,
@@ -46,14 +45,17 @@ const getGoals = async (req, res) => {
 };
 
 const newGoal = async (req, res) => {
+    const goalDesc = req.body.goal_desc;
+    const timeDue = req.body.time_due;
+
     const uid = req.uid.uid;
     const goal_id = uuidv4();
     const goalDoc = db.collection('goals').doc(goal_id);
     goalDoc.set({
         user_id: uid,
-        goal_desc: req.body.goal_desc,
+        goal_desc: goalDesc,
         time_made: new Date().getTime(),
-        time_due: new Date(parseInt(req.body.time_due)).getTime(),
+        time_due: new Date(parseInt(timeDue)).getTime(),
         status: 'Incomplete'
     });
     res.status(200).send('Goal successfully set');

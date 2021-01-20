@@ -16,7 +16,7 @@ echo "+----------------------------------------------------------------------+"
 echo "|                       CONTAINER RUNNING                              |"
 echo "+----------------------------------------------------------------------+"
 
-firebase deploy
+# firebase deploy
 
 #When build is completed, some options may come up.  If so, do the following:
 #Service name: Type the name of the service, for us, I am using trash-talking

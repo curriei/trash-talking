@@ -6,55 +6,67 @@ const performQuery = async (bins, timeStart, timeEnd) => {
     let values = [];
     const garbageRef = db.collection('data-entries');
 
-    for (const doc of bins) {
-        const garbageQuery = await garbageRef
-            .where('bin_id', '==', doc)
-            // .where('time_stamp', '>=', timeStart)
-            // .where('time_stamp', '<=', timeEnd)
-            .orderBy('time_stamp').get();
-        garbageQuery.forEach(val => {
-            values.push(val.data());
-        });
-    }
+    const garbageQuery = await garbageRef
+        .where('bin_id', 'in', bins)
+        .where('time_stamp', '>=', timeStart)
+        .where('time_stamp', '<=', timeEnd)
+        .orderBy('time_stamp').get();
 
+    garbageQuery.forEach(val => {
+        values.push(val.data());
+    });
     return values;
 };
 
-//Return garbage entries themselves
-const garbageEntries = async (req, res) => {
-    const uid = req.uid.uid;
-    const timeStart = req.body.time_start;
-    const timeEnd = req.body.time_end;
-    let bins = req.body.bins;
 
-    //No bin specified, or * specified.  Query for all bins registered with uid.
-    if (bins === undefined || bins === '*') {
+//Helper function used by garbageEntries and garbageQuery to evaluate input body.
+const getBins = async (bins, user_id) => {
+
+    let result;
+    //No bin specified, or * specified.  Query for all bins registered with user_id.
+    if (bins === undefined || bins === '*' || bins === "") {
         const binRef = db.collection('bins');
-        const binQuery = await binRef.where('user_id', '==', uid).get();
+        const binQuery = await binRef.where('user_id', '==', user_id).get();
 
         if (binQuery.empty) {
-            return res.status(200).send('User has no registered bins');
+            throw 'User has no registered bins';
         }
 
-        bins = [];
-        binQuery.forEach(doc => bins.push(doc.id));
+        result = [];
+        binQuery.forEach(doc => result.push(doc.id));
 
     }
     // One bin specified, will be of type string representing binId.
     else if (typeof bins === "string") {
         const bin = await db.collection('bins').doc(bins).get();
-        if (!bin.exists) return res.status(400).send(`Bin ${bins} does not exist.`);
-        if (!bin.data().user_id === uid) return res.status(400).send(`User not permitted to view bin with ID: ${bins}`);
-        bins = [bins];
+        if (!bin.exists) throw `Bin ${bins} does not exist.`;
+        if (!bin.data().user_id === user_id) throw `User not permitted to view bin with ID: ${bins}`;
+        result = [bins];
     }
     // Multiple bins specified, go through each binId in bins.
     else {
+        result = [];
         for (const binId of bins) {
             const bin = await db.collection('bins').doc(binId).get();
-            if (!bin.exists) return res.status(400).send(`Bin ${binId} does not exist.`);
-            if (!bin.data().user_id === uid) return res.status(400).send(`User not permitted to view bin with ID: ${binId}`);
-            bins.push(binId);
+            if (!bin.exists) throw `Bin ${binId} does not exist.`;
+            if (!bin.data().user_id === user_id) throw `User not permitted to view bin with ID: ${binId}`;
+            result.push(binId);
         }
+    }
+    return result;
+};
+
+//Return garbage entries themselves
+const garbageEntries = async (req, res) => {
+    const user_id = req.uid.uid;
+    const timeStart = parseInt(req.body.time_start);
+    const timeEnd = parseInt(req.body.time_end);
+
+    let bins;
+    try {
+        bins = await getBins(req.body.bins, user_id)
+    } catch (e) {
+        return res.status(400).send(e)
     }
 
     const entries = await performQuery(bins, timeStart, timeEnd);
@@ -62,65 +74,43 @@ const garbageEntries = async (req, res) => {
     if (entries.length === 0) {
         return res.status(200).send("No data entries found.");
     }
-    res.status(200).send(entries);
+    res.status(200).json({
+        num_entries: entries.length,
+        data: entries
+    });
 };
 
 
 //Returns totals for the amount per increment
 const garbageQuery = async (req, res) => {
-    const uid = req.uid.uid;
+    const user_id = req.uid.uid;
     const timeStart = parseInt(req.body.time_start);
     const timeEnd = parseInt(req.body.time_end);
     const interval = req.body.interval;
-    let bins = req.body.bins;
 
-    //No bin specified, or * specified.  Query for all bins registered with uid.
-    if (bins === undefined || bins === '*') {
-        const binRef = db.collection('bins');
-        const binQuery = await binRef.where('user_id', '==', uid).get();
-
-        if (binQuery.empty) {
-            return res.status(200).send('User has no registered bins');
-        }
-
-        bins = [];
-        binQuery.forEach(doc => bins.push(doc.id));
-
-    }
-    // One bin specified, will be of type string representing binId.
-    else if (typeof bins === "string") {
-        const bin = await db.collection('bins').doc(bins).get();
-        if (!bin.exists) return res.status(400).send(`Bin ${bins} does not exist.`);
-        if (!bin.data().user_id === uid) return res.status(400).send(`User not permitted to view bin with ID: ${bins}`);
-        bins = [bins];
-    }
-    // Multiple bins specified, go through each binId in bins.
-    else {
-        for (const binId of bins) {
-            const bin = await db.collection('bins').doc(binId).get();
-            if (!bin.exists) return res.status(400).send(`Bin ${binId} does not exist.`);
-            if (!bin.data().user_id === uid) return res.status(400).send(`User not permitted to view bin with ID: ${binId}`);
-            bins.push(binId);
-        }
+    let bins;
+    try {
+        bins = await getBins(req.body.bins, user_id)
+    } catch (e) {
+        return res.status(400).send(e)
     }
 
     const entries = await performQuery(bins, timeStart, timeEnd);
-    if (entries.length === 0) return res.status(204).send('No data entries found.');
+    if (entries.length === 0) return res.status(400).send('No data entries found.');
 
-
-    //Switch on interval to build up categories of intervals to put data in.
     const queryInterval = {start: new Date(timeStart), end: new Date(timeEnd)};
     let subIntervalBreaks = [];
-    let result = {
-        interval_type: (interval ? interval : 'all'),
-        data: {}
-    };
     let lastDay;
+
+    //Switch on interval to sort entries by day, week, month, or year.
     switch (interval) {
         case 'day':
             subIntervalBreaks = dateFns.eachDayOfInterval(queryInterval);
             if (subIntervalBreaks.length === 0) {
-                subIntervalBreaks = [queryInterval['start'], queryInterval['end']];
+                subIntervalBreaks = [
+                    dateFns.startOfDay(queryInterval['start']),
+                    dateFns.addMilliseconds(dateFns.endOfDay(queryInterval['end']), 1)
+                ];
                 break;
             }
             lastDay = new Date(subIntervalBreaks[subIntervalBreaks.length - 1]);
@@ -129,7 +119,10 @@ const garbageQuery = async (req, res) => {
         case 'week':
             subIntervalBreaks = dateFns.eachWeekOfInterval(queryInterval);
             if (subIntervalBreaks.length === 0) {
-                subIntervalBreaks = [queryInterval['start'], queryInterval['end']];
+                subIntervalBreaks = [
+                    dateFns.startOfWeek(queryInterval['start']),
+                    dateFns.addMilliseconds(dateFns.endOfWeek(queryInterval['end']), 1)
+                ];
                 break;
             }
             lastDay = new Date(subIntervalBreaks[subIntervalBreaks.length - 1]);
@@ -138,17 +131,22 @@ const garbageQuery = async (req, res) => {
         case 'month':
             subIntervalBreaks = dateFns.eachMonthOfInterval(queryInterval);
             if (subIntervalBreaks.length === 0) {
-                subIntervalBreaks = [queryInterval['start'], queryInterval['end']];
+                subIntervalBreaks = [
+                    dateFns.startOfMonth(queryInterval['start']),
+                    dateFns.addMilliseconds(dateFns.endOfMonth(queryInterval['end']), 1)
+                ];
                 break;
             }
             lastDay = new Date(subIntervalBreaks[subIntervalBreaks.length - 1]);
             subIntervalBreaks.push(dateFns.addMonths(lastDay, 1));
-            subIntervalBreaks.push(subIntervalBreaks[subIntervalBreaks.length - 1].addMonths(1));
             break;
         case 'year':
             subIntervalBreaks = dateFns.eachYearOfInterval(queryInterval);
             if (subIntervalBreaks.length === 0) {
-                subIntervalBreaks = [queryInterval['start'], queryInterval['end']];
+                subIntervalBreaks = [
+                    dateFns.startOfYear(queryInterval['start']),
+                    dateFns.addMilliseconds(dateFns.endOfYear(queryInterval['end']), 1)
+                ];
                 break;
             }
             lastDay = new Date(subIntervalBreaks[subIntervalBreaks.length - 1]);
@@ -157,6 +155,12 @@ const garbageQuery = async (req, res) => {
         default:
             subIntervalBreaks = [queryInterval['start'], queryInterval['end']];
     }
+
+    let result = {
+        interval_type: (interval ? interval : 'all'),
+        num_intervals: 0,
+        data: {}
+    };
 
     //Sum weight and volume for data entries over sub-interval breaks.
     let i_entries = 0;
@@ -177,7 +181,8 @@ const garbageQuery = async (req, res) => {
         result['data'][subIntervalBreaks[i_interval].getTime()] = {
             weight: interval_weight_sum,
             volume: interval_volume_sum
-        }
+        };
+        result['num_intervals']++;
     }
 
     res.status(200).json(result);

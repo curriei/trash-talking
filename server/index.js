@@ -26,4 +26,7 @@ app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
 
-//TODO: verifyBin auth function, goals in general tbh. Garbage query time constraints.
+//TODO: verifyBin auth function
+//TODO: goals in general.
+//TODO: search user stuff and friends.
+//TODO: units!

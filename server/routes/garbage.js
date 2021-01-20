@@ -5,5 +5,4 @@ const garbageControllers = require('../controllers/garbage.js');
 router.get('/query', auth.verifyToken, garbageControllers.garbageQuery);
 router.get('/entries', auth.verifyToken, garbageControllers.garbageEntries);
 
-
 module.exports = router;

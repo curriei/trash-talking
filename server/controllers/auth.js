@@ -14,6 +14,7 @@ const createUser = async (req, res) => {
 
     admin.auth().createUser({
         uid: user_id,
+        username: user_id,
         email: email,
         emailVerified: false,
         password: password,
@@ -25,7 +26,7 @@ const createUser = async (req, res) => {
                 console.log("New user created:", userRecord.uid);
                 res.status(200).json({
                     action: "Success",
-                    description: `User ${username} created.`
+                    description: `User ${user_id} created.`
                 });
             })
         .catch(

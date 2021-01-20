@@ -7,13 +7,19 @@ const createBin = async (req, res) => {
     if (binArea === undefined)
         binArea = Math.pow((body.diameter / 2.0), 2) * Math.PI;
 
+    if (binArea < 0) return res.status(400).send('Bin area must be greater than 0');
+
     const binId = uuidv4();
     await db.collection('bins').doc(binId).set({
         activated: false,
         bin_area: binArea
     });
     console.log('Bin created with ID:', binId);
-    res.status(200).send(`Bin created with ID: ${binId}`);
+    res.status(200).json({
+        status: "success",
+        message: "Bin created",
+        bin_id: binId
+    });
 };
 
 const registerBin = async (req, res) => {
@@ -36,8 +42,8 @@ const registerBin = async (req, res) => {
         activated: true
     });
 
-    console.log(`Bin with ID ${binId} added.`);
-    res.status(200).send(`Bin with ID ${binId} added.`);
+    console.log(`Bin with ID ${binId} registered.`);
+    res.status(200).send(`Bin with ID ${binId} registered.`);
 };
 
 const binUpdate = async (req, res) => {
@@ -45,9 +51,12 @@ const binUpdate = async (req, res) => {
     const update_id = uuidv4();
     const body_json = req.body;
     const binId = body_json.bin_id;
-    const weight = body_json.weight;
-    const distance = body_json.distance;
+    const weight = parseFloat(body_json.weight);
+    const distance = parseFloat(body_json.distance);
     const timeStamp = new Date().getTime();
+
+    if (isNaN(distance) || typeof distance !== 'number') return res.status(400).send("Distance must be a number");
+    if (isNaN(weight) || typeof weight !== 'number') return res.status(400).send('Weight must be a number');
 
     //Get bin data and check if exists
     let binDocRef;
@@ -99,7 +108,7 @@ const binUpdate = async (req, res) => {
             volume: deltaVolume,
             time_stamp: timeStamp
         });
-        res.status(200).send(`${deltaWeight} weight added for bin: ${binId}`);
+        res.status(200).send(`${deltaWeight} weight and ${deltaVolume} volume added for bin: ${binId}`);
     } else {
         res.status(200).send('Bag removed, no garbage recorded.');
     }
@@ -126,21 +135,10 @@ const current = async (req, res) => {
     const currentWeight = bin.data().last_weight - bin.data().bin_weight;
     const currentVolume = (bin.data().bin_distance - bin.data().last_distance) * bin.data().bin_area;
 
-    const date = new Date(bin.data().last_update);
     res.status(200).json({
         current_weight: currentWeight,
         current_volume: currentVolume,
-        last_update: {
-            year: date.getFullYear(),
-            month: date.getMonth(),
-            date: date.getDate(),
-            day: date.getDay(),
-            hour: date.getHours(),
-            minute: date.getMinutes(),
-            second: date.getSeconds(),
-            time_stamp: date.getTime(),
-            time_zone_offset: date.getTimezoneOffset()
-        }
+        last_update: bin.data().last_update
     });
 };
 
