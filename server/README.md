@@ -1,6 +1,23 @@
 # Server Side API
 Root Hosting URL: https://trash-talking-mksvgldida-uc.a.run.app/
 
+## List of Endpoints
+* Users
+  * POST /users/new - Create new user
+  * POST /users/login - Login user and get token
+  * GET /users/profile - Get user profile
+  * GET /users/bins - Get bins registered with logged in user
+  * GET /users/goals - Get logged in user's goals
+  * POST /users/goals/new - Create new goal for user
+* Bins
+  * POST /bins/create_bin - Admin create new bin
+  * POST /bins/register - Register a bin with logged in user's account
+  * POST /bins/update - Update the garbage values for a specific bin
+  * GET /bins/current - Get current levels of garbage in bin
+* Garbage
+  * GET /garbage/entries - Get individual entries of garbage
+  * GET /garbage/query - Get summation information about garbage production
+
 ## Users
 ### POST /users/new
 Creates a new user.
