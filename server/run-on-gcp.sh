@@ -4,19 +4,14 @@
 PROJECT_ID="trashtalking-96ed8"
 BUILD_NAME="trash-talking"
 
-gcloud builds submit --tag gcr.io/${PROJECT_ID}/${BUILD_NAME}
+gcloud builds submit --tag gcr.io/${PROJECT_ID}/${BUILD_NAME} .
 
 echo "+----------------------------------------------------------------------+"
-echo "|                       BUILD COMPLETED                                |"
+echo "|                       BUILD FINISHED                                 |"
 echo "+----------------------------------------------------------------------+"
 
 gcloud beta run deploy --image gcr.io/${PROJECT_ID}/${BUILD_NAME} --platform managed
 
-echo "+----------------------------------------------------------------------+"
-echo "|                       CONTAINER RUNNING                              |"
-echo "+----------------------------------------------------------------------+"
-
-firebase deploy
 
 #When build is completed, some options may come up.  If so, do the following:
 #Service name: Type the name of the service, for us, I am using trash-talking

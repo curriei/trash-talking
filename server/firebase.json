@@ -1,26 +1,6 @@
 {
   "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
-  },
-  "hosting": {
-    "public": "public",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
-    "rewrites": [
-      {
-        "source": "**",
-        "run": {
-          "serviceId": "trash-talking",
-          "region": "us-central1"
-        }
-      }
-    ]
-  },
-  "storage": {
-    "rules": "storage.rules"
+    "rules": "./firebase/firestore.rules",
+    "indexes": "./firebase/firestore.indexes.json"
   }
 }
