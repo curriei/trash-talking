@@ -118,7 +118,7 @@ const binUpdate = async (req, res) => {
 
 //Get current bin fill level
 const current = async (req, res) => {
-    const uid = req.uid.uid;
+    const user_id = req.uid.uid;
     const binId = req.body.bin_id;
 
     const bin = await db.collection('bins').doc(binId).get();
@@ -132,7 +132,7 @@ const current = async (req, res) => {
         return res.status(400).send("Bin has never been updated.");
     }
     //Check if bin matches registered user.
-    if (bin.data().user_id !== uid) {
+    if (bin.data().user_id !== user_id) {
         return res.status(400).send('Bin does not belong to this user.');
     }
     const currentWeight = bin.data().last_weight - bin.data().bin_weight;

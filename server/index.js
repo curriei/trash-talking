@@ -30,3 +30,4 @@ app.listen(port, () => {
 //TODO: goals in general.
 //TODO: search user stuff and friends.
 //TODO: units!
+//TODO: firebase indexing/rules
