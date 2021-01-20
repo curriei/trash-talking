@@ -1,0 +1,255 @@
+Create New User
+
+Request:
+
+POST /user/new/ HTTP/1.1
+Host: xxx:xxx
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 82
+
+first name=Alexie&last name=McDonald&username=alexiem&email=mcdona16@mcmaster.ca&password=secret123
+
+Successful Response:
+
+HTTP/1.1 200 OK
+Date: XX, XX XXX 2021 00:00:00 GMT
+Connection: close
+Content-Type: application/json
+charset=UTF-8
+Content-Length: xx
+
+{
+	"action": "Success",
+	"description": "New user created."
+}
+
+Authenticate User
+
+Request:
+
+POST /auth HTTP/1.1
+Host: xxx:xxx
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 45
+
+username=alexiem&password=secret123
+
+Successful Response:
+
+HTTP/1.1 200 OK
+Date: XX, XX XXX 2021 00:00:00 GMT
+Connection: keep-alive
+Content-Type: application/json
+charset=UTF-8
+Content-Length: xx
+
+{
+	"action": "Success",
+	"description": "Login successful."
+	"token": "V1QRSYBTB6X87MGCRTI3"
+}
+
+Get Profile Information
+
+Request:
+
+GET /users/profile HTTP/1.1
+Host: xxx:xxx
+Content-Type: application/x-www-form-urlencoded
+Content-Length: 58
+
+username=alexiem&token=V1QRSYBTB6X87MGCRTI3
+
+Successful Response:
+
+HTTP/1.1 200 OK
+Date: XX, XX XXX 2021 00:00:00 GMT
+Connection: keep-alive
+Content-Type: application/json
+charset=UTF-8
+Content-Length: xx
+
+{
+	"action": "Success",
+	"first-name": "Alexie",
+	"last-name": "McDonald",
+	"email": "mcdona16@mcmaster.ca",
+	"date-joined": "November 5, 2020"
+}
+
+Search Users
+
+Request:
+
+GET /users/search HTTP/1.1
+Host: xxx:xxx
+Content-Type: application/x-www-form-urlencoded
+Content-Length: xx
+
+query=ale&token=V1QRSYBTB6X87MGCRTI3
+
+Successful Response:
+
+HTTP/1.1 200 OK
+Date: XX, XX XXX 2021 00:00:00 GMT
+Connection: keep-alive
+Content-Type: application/json
+charset=UTF-8
+Content-Length: xx
+
+{
+	"num-results": 2,
+	"results":
+		[
+			{
+				"username": "alexiem",
+				"first-name": "Alexie",
+				"last-name": "McDonald",
+				"date-joined": "November 5, 2020"
+			},
+			{
+				"username": "alex123",
+				"first-name": "Alexander",
+				"last-name": "Doe",
+				"date-joined": "January 1, 2021"
+			}
+		]
+}
+
+Get User Goals
+
+Request:
+
+GET /users/goals HTTP/1.1
+Host: xxx:xxx
+Content-Type: application/x-www-form-urlencoded
+Content-Length: xx
+
+username=alexiem&token=V1QRSYBTB6X87MGCRTI3
+
+Successful Response:
+
+HTTP/1.1 200 OK
+Date: XX, XX XXX 2021 00:00:00 GMT
+Connection: keep-alive
+Content-Type: application/json
+charset=UTF-8
+Content-Length: xx
+
+{
+	"num-goals": 1,
+	"goals":
+		[
+			{
+				"goal-desc": "I want to reduce my trash by 5 lbs a week",
+				"date-made": "November 29, 2020",
+				"due-date": "February 5, 2021",
+				"status": "Incomplete"
+			}
+		]
+}
+
+Get Weekly Garbage Statistics
+
+Request:
+
+GET /garbage/ HTTP/1.1
+Host: xxx:xxx
+Content-Type: application/x-www-form-urlencoded
+Content-Length: xx
+
+increment=weekly&username=alexiem&date_start=12-28-2020&garbage_id=0&token=V1QRSYBTB6X87MGCRTI3
+
+Successful Response:
+
+HTTP/1.1 200 OK
+Date: XX, XX XXX 2021 00:00:00 GMT
+Connection: keep-alive
+Content-Type: application/json
+charset=UTF-8
+Content-Length: xx
+
+[
+	{
+		"date": "12-28-2020,
+		"weight": 20
+	},
+	{
+		"date": "12-29-2020,
+		"weight": 24
+	},
+	{
+		"date": "12-30-2020,
+		"weight": 5
+	},
+	{
+		"date": "12-31-2020,
+		"weight": 7
+	},
+	{
+		"date": "01-01-2021,
+		"weight": 10
+	},
+	{
+		"date": "01-02-2021,
+		"weight": 13
+	}
+]
+
+Get Monthly Garbage Statistics
+
+Request:
+
+GET /garbage/ HTTP/1.1
+Host: xxx:xxx
+Content-Type: application/x-www-form-urlencoded
+Content-Length: xx
+
+increment=monthly&username=alexiem&date_start=12-01-2020&garbage_id=0&token=V1QRSYBTB6X87MGCRTI3
+
+Successful Response:
+
+HTTP/1.1 200 OK
+Date: XX, XX XXX 2021 00:00:00 GMT
+Connection: keep-alive
+Content-Type: application/json
+charset=UTF-8
+Content-Length: xx
+
+[
+	{
+		"month": "December",
+		"weight": 35
+	},
+	{
+		"month": "January",
+		"weight": 23
+	}
+]
+
+Get Current Fill Weight
+
+Request:
+
+GET /garbage/current HTTP/1.1
+Host: xxx:xxx
+Content-Type: application/x-www-form-urlencoded
+Content-Length: xx
+
+username=alexiem&garbage_id=0&token=V1QRSYBTB6X87MGCRTI3
+
+Successful Response:
+
+HTTP/1.1 200 OK
+Date: XX, XX XXX 2021 00:00:00 GMT
+Connection: keep-alive
+Content-Type: application/json
+charset=UTF-8
+Content-Length: xx
+
+{
+	"current_weight": 27,
+	"timestamp": 01-07-2021:00:01:57.145
+}
+
+

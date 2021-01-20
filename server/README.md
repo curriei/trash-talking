@@ -269,4 +269,3 @@ ADMIN_PASSWORD: Password for admin only endpoints.
 
 GOOGLE_OAUTH_FILE: File name of google oauth json file for firebase admin service account.
 
-
