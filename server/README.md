@@ -1,25 +1,25 @@
-#Server Side API
+# Server Side API
 Root Hosting URL: https://trash-talking-mksvgldida-uc.a.run.app/
 
-##Users
-###POST /users/new
+## Users
+### POST /users/new
 Creates a new user.
-####Request Body
+#### Request Body
 * user_id: Unique user id
 * email: Email (does need to be unique)
 * password: Password
 * name: Display name (does not need to be unique)
-####Result
+#### Result
 200
-####Errors
+#### Errors
 * 400 - Error forwarded from firebase.
 
-###POST /users/login
+### POST /users/login
 Logs user in and provides an auth token.
-####Request Body
+#### Request Body
 * email: email
 * password: password
-####Result
+#### Result
 ```$xslt
 {
     action: Success
@@ -27,16 +27,16 @@ Logs user in and provides an auth token.
     token: [AUTH_TOKEN]
 }
 ```
-####Errors
+#### Errors
 * 400 - Incorrect credentials provided.
 
 
-###GET /users/profile/
+### GET /users/profile/
 Allows the viewing of any user's profile. Requires login token but any logged-in user can view any other user's profile. 
-####Request Body
+#### Request Body
 * user_id: User ID of the viewed profile.
 * token: Login token.
-####Result
+#### Result
 ```$xslt
 {
     "user_id": test12345,
@@ -44,15 +44,15 @@ Allows the viewing of any user's profile. Requires login token but any logged-in
     "email": iancurrie08@gmail.com
 }
 ```
-####Errors
+#### Errors
 * 400 - ```{"code":"auth/user-not-found", "message":...}```
 * 400 - Access denied, no token specified
 
-###GET /users/bins
+### GET /users/bins
 Returns the details of all bins for the logged in user according to login token. Users can only view their own bins.
-####Request Body
+#### Request Body
 * token: Login token.
-####Result
+#### Result
 ```$xslt
 {
     num_bins: 2,
@@ -84,15 +84,15 @@ Within bin objects:
 * bin_weight: distance of empty bin
 
 **Note: use current if looking for current levels of a given bin, not this.**
-####Errors
+#### Errors
 400 - Access denied, no token specified.
 
 
-###GET /users/goals
+### GET /users/goals
 Get the outstanding goals for the logged in user. Requires login, and users can only see their own goals.
-####Request Body
+#### Request Body
 * token: login token.
-####Result
+#### Result
 ```$xslt
 {
     num_goals: 2,
@@ -108,28 +108,28 @@ Get the outstanding goals for the logged in user. Requires login, and users can 
     }
 }
 ```
-####Errors
+#### Errors
 400 - Access denied, no token specified.
 
-###POST /users/goals/new
+### POST /users/goals/new
 Creates a new goal. Authentication required.
-####Request Body
+#### Request Body
 * token: Login token.
 * goal_desc: Description of goal 
 * time_due: Due date of the goal in seconds since epoch time.
-####Result
+#### Result
 200
-####Errors
+#### Errors
 400 - Access denied, no token specified.
 
-##Bins
-###POST /bins/create_bin
+## Bins
+### POST /bins/create_bin
 Admin only endpoint, used whenever a bin is created and shipped out to customers.  Bin ID would have to be included in the box for the user to use to register bin.  This will be changing shortly for security.
-####Request Body
+#### Request Body
 * diameter: (Alternative to bin_area) Measured diameter of bin, used to calculate bin_area (assuming bin is cylindrical) and in volume calculations.
 * bin_area: (Alternative to diameter) Measured area of bottom of horizontal cross section of bin.  Used in volume calculations.
 * admin_password: Admin password as irresponsibly included in .env file.
-####Result
+#### Result
 200 - 
 ```$xslt
 {
@@ -138,40 +138,40 @@ Admin only endpoint, used whenever a bin is created and shipped out to customers
         bin_id: [BIN_ID]
     }
 ```
-####Errors
+#### Errors
 400 - No admin_password specified
 400 - Incorrect admin_password specified
 
-###POST /bins/register
+### POST /bins/register
 Login required for this endpoint, registers a bin which was purchased with a specific account.  User needs to open and close the lid when the register (to get initial measurements of the bin).
-####Request Body
+#### Request Body
 * bin_id: Bin ID from bin creation.
 * token: Token given by users/login endpoint.
-####Result
+#### Result
 200 - Bin with id [BIN_ID] registered. 
-####Errors
+#### Errors
 * 400 - Bin does not exist
 * 400 - Bin has already been registered.
 
-###POST /bins/update
+### POST /bins/update
 Endpoint for a bin to send to whenever an update is required. Checks to see if bag is removed, and if not gets an update on the weight and volume of garbage in the bin.
-####Request Body
+#### Request Body
 * bin_id: Bin ID from bin creation.
 * weight: Absolute weight measurement.
 * distance: Absolute distance measurement.
-####Result
+#### Result
 * 200 - Bag added, no garbage recorded
 * 200 - [WEIGHT] weight, [VOLUME] volume added for bin [BIN_ID].
-####Errors
+#### Errors
 * 400 - Bin does not exist
 * 400 - Firebase error: [ERROR]
 
-###GET /bins/current
+### GET /bins/current
 Returns current weight and volume in bin.  Checks for login and that bin is owned by current user.
-####Request Body
+#### Request Body
 * bin_id: Bin ID from bin creation.
 * token: token from user/login.
-####Result
+#### Result
 ```
 {
 current_weight: 12,
@@ -179,22 +179,22 @@ current_volume: 5,
 last_update: 1611099398517
 }
 ```
-####Errors
+#### Errors
 * 400 - No/unknown token provided.
 * 400 - Bin does not exist
 * 400 - Bin does not belong to this user
 * 400 - Bin has never been updated before
 
 
-##Garbage 
-###GET /garbage/entries
+## Garbage 
+### GET /garbage/entries
 Returns all entries for the relevant bins between time_start and time_end.  Entries will be ordered in ascending order by time_stamp.
-####Request Body
+#### Request Body
 * token: Login token.
 * time_start: Starting date for query.
 * time_end: Ending date for query.
 * bins: OPTIONAL, can be a list of binIDs to look for. If empty will just return entries for all bins registered to logged in user.
-####Result
+#### Result
 * 200 - 
 ```
 {
@@ -212,26 +212,26 @@ Returns all entries for the relevant bins between time_start and time_end.  Entr
 ```
 * 200 - No data entries within parameters found
 
-####Errors
+#### Errors
 * 400 - Bin with id [BIN_ID] does not exist
 * 400 - User has no registered bins
 * 400 - User not permitted to view bin [BIN_ID]
 
-###GET /garbage/query
+### GET /garbage/query
 Returns summary data about the entries over the time interval specified.  Returns data in the form of objects named by the first time of the period with weight and volume for that period represented within the object (see example result).  
 
 Will always make periods outside of the bounds of the start/end time, but only include entries within the start/end time in the totals. Eg. If interval type is year and start and end times are only between Jan 15 2021 and Feb 15 2021, the period will be Jan 1 2021 - Dec 31 2021, but any entry from before Jan 15 or before Feb 15 will not be included in the total for that year.
 
 Let Ian know if you would like to talk more about this behaviour, happy to change it if there is a better way.
  
-####Request Body
+#### Request Body
 * token: Login token
 * time_start: Start time for the query interval in microseconds since epoch time.
 * time_end: End time for the query interval in microseconds since epoch time.
 * interval: (OPTIONAL) One of [day, week, month, or year].  If anything else or left undefined, will default to not segmenting data (eg. giving sum of all weight and volume over entire period specified with time_start and time_end)
 * bins: OPTIONAL, can be a list of binIDs to look for. If empty will just return entries for all bins registered to logged in user.
 
-####Result
+#### Result
 200 - 
 ```
 {
@@ -253,12 +253,12 @@ Let Ian know if you would like to talk more about this behaviour, happy to chang
     }
 }
 ```
-####Errors
+#### Errors
 * 400 - Bin with id [BIN_ID] does not exist
 * 400 - User has no registered bins
 * 400 - User not permitted to view bin [BIN_ID]
 
-#To Run on GCP
+# To Run on GCP
 I have set up a simple script to go through all the steps of running through cloud run and routing the firebase hosting to the app.  You should be able to get it going using run-on-gcp.sh, however you will need the .env and google key json files with the following fields in the .env file:
 
 TOKEN_SECRET: Random string of digits for JWT authentication secret.
