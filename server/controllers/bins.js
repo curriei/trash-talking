@@ -22,6 +22,7 @@ const createBin = async (req, res) => {
     });
 };
 
+//Register bin with user account.  User must still "update bin" by opening lid.
 const registerBin = async (req, res) => {
     //Json manipulation
     const body = req.body;
@@ -46,6 +47,7 @@ const registerBin = async (req, res) => {
     res.status(200).send(`Bin with ID ${binId} registered.`);
 };
 
+//Called by bin controller to update server values
 const binUpdate = async (req, res) => {
     //Json Manipulation
     const update_id = uuidv4();
@@ -114,6 +116,7 @@ const binUpdate = async (req, res) => {
     }
 };
 
+//Get current bin fill level
 const current = async (req, res) => {
     const uid = req.uid.uid;
     const binId = req.body.bin_id;
