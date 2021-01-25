@@ -1,0 +1,52 @@
+<ion-menu side="start" menuId="custom" contentId="main" class="my-custom-menu">
+  <ion-header>
+    <ion-toolbar color="primary">
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>Menu</ion-title>
+    </ion-toolbar>
+  </ion-header>
+  <ion-content>
+    <ion-list>
+      <ion-item><a [routerLink]="['/main']">Main</a></ion-item>
+      <ion-item><a [routerLink]="['/profile']">Profile</a></ion-item>
+      <ion-item><a [routerLink]="['/goals']">Goals</a></ion-item>
+      <ion-item><a [routerLink]="['/search']">Search</a></ion-item>
+      <ion-item><a [routerLink]="['/']">Log Out</a></ion-item>
+    </ion-list>
+  </ion-content>
+</ion-menu>
+
+<div id=main>
+  <ion-header [translucent]="true">
+    <ion-toolbar>
+      <ion-buttons slot="start">
+        <ion-menu-button></ion-menu-button>
+      </ion-buttons>
+      <ion-title>
+        TrashTalking
+      </ion-title>
+    </ion-toolbar>
+  </ion-header>
+
+    <div id="container" style="padding-top: 300px;">
+    <h1>Friend Requests</h1>
+    <p *ngIf="entries == null || entries.length == 0">You have no friend requests currently. Please check back later!</p>
+    <ion-list *ngFor="let entry of entries">
+      <ion-item>
+        <img src="assets/images/usericon.png" width="30" height="30">
+        <p> {{entry.user1_fname}} {{entry.user1_lname}}</p>
+        <ion-button (click)="confirmFriend(entry)" color="primary">Accept Request</ion-button>
+    </ion-item>
+    </ion-list>
+    <h1>Friends</h1>
+    <p *ngIf="current == null || current.length == 0">You have no friends currently. Head to the search page to find some users!</p>
+    <ion-list *ngFor="let friend of current">
+      <ion-item>
+        <img src="assets/images/usericon.png" width="30" height="30">
+        <p> {{friend.user1_fname}} {{friend.user1_lname}}</p>
+    </ion-item>
+    </ion-list>
+  </div>
+</div>
