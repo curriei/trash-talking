@@ -62,6 +62,7 @@ export class MainPage {
   constructor(private router: Router, private menu: MenuController, private crudService: GarbageService) {}
 
   ngOnInit() {
+    console.log(this.crudService.getAll().snapshotChanges());
     this.crudService.getAll().snapshotChanges().pipe(
       map(changes =>
         changes.map(c =>

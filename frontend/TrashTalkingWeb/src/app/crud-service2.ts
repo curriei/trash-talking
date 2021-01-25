@@ -24,6 +24,7 @@ export class GarbageService {
   }
 
   getAll(): AngularFirestoreCollection<Garbage> {
+    console.log(this.garbageRef);
     return this.garbageRef;
   }
 
