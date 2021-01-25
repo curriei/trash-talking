@@ -3,11 +3,20 @@ import { Router } from "@angular/router";
 import User from './user';
 import { AngularFireAuth } from "@angular/fire/auth";
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
-
+import { HttpClient } from '@angular/common/http';
 @Injectable({
   providedIn: 'root'
 })
+/*
+export class AuthenticationService {
+  constructor(private http: HttpClient) {}
 
+  SignIn(email, password) {
+    
+    return this.ngFireAuth.signInWithEmailAndPassword(email,password)
+    }
+}
+*/
 export class AuthenticationService {
   userData: any;
   private dbPath = '/users';
@@ -15,6 +24,7 @@ export class AuthenticationService {
   userRef: AngularFirestoreCollection<User> = null;
 
   constructor(
+    private http: HttpClient,
     public ngFireAuth: AngularFireAuth,
     public router: Router,
     private db: AngularFirestore
@@ -34,6 +44,10 @@ export class AuthenticationService {
 
   // Login in with email/password
   SignIn(email, password) {
+    /*
+    this.http.post<any>("https://trash-talking-mksvgldida-uc.a.run.app/users/login/", JSON.stringify({"email": email, "password": password})).subscribe(data => {
+      console.log(data)
+    });*/
     return this.ngFireAuth.signInWithEmailAndPassword(email,password)
   }
 

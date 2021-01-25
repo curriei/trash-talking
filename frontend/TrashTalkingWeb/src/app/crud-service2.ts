@@ -9,7 +9,7 @@ import Goal from './goal';
 })
 export class GarbageService {
 
-  private dbPath = '/data-entries';
+  private dbPath = '/data-entries-old';
   private dbPath2 = '/users';
   private dbpath3 = '/goals'
 
