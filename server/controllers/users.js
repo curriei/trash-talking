@@ -3,7 +3,7 @@ const uuidv4 = require('uuid').v4;
 
 //Get User Profile
 const getUser = async (req, res) => {
-    const userId = req.body.user_id;
+    const userId = req.query.user_id;
     admin.auth().getUser(userId)
         .then((userRecord) => {
             res.status(200).json({
@@ -19,7 +19,7 @@ const getUser = async (req, res) => {
 
 //Get bins relating to user
 const getBins = async (req, res) => {
-    const user_id = req.uid.uid;
+    const user_id = req.user.uid;
     const binQuery = await db.collection('bins').where('user_id', '==', user_id).get();
     let result = {};
     let num = 0;
@@ -35,7 +35,7 @@ const getBins = async (req, res) => {
 
 //Get goals associated with user
 const getGoals = async (req, res) => {
-    const user_id = req.uid.uid;
+    const user_id = req.user.uid;
     const goalQuery = await db.collection('goals').where('user_id', '==', user_id).get();
     let result = {};
     goalQuery.forEach(goal => {
@@ -52,7 +52,7 @@ const newGoal = async (req, res) => {
     const goalDesc = req.body.goal_desc;
     const timeDue = req.body.time_due;
 
-    const user_id = req.uid.uid;
+    const user_id = req.user.uid;
     const goal_id = uuidv4();
     const goalDoc = db.collection('goals').doc(goal_id);
     goalDoc.set({

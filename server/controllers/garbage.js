@@ -58,13 +58,13 @@ const getBins = async (bins, user_id) => {
 
 //Return garbage entries themselves
 const garbageEntries = async (req, res) => {
-    const user_id = req.uid.uid;
-    const timeStart = parseInt(req.body.time_start);
-    const timeEnd = parseInt(req.body.time_end);
+    const user_id = req.user.uid;
+    const timeStart = parseInt(req.query.time_start);
+    const timeEnd = parseInt(req.query.time_end);
 
     let bins;
     try {
-        bins = await getBins(req.body.bins, user_id)
+        bins = await getBins(req.query.bins, user_id)
     } catch (e) {
         return res.status(400).send(e)
     }
@@ -83,14 +83,14 @@ const garbageEntries = async (req, res) => {
 
 //Returns totals for the amount per increment
 const garbageQuery = async (req, res) => {
-    const user_id = req.uid.uid;
-    const timeStart = parseInt(req.body.time_start);
-    const timeEnd = parseInt(req.body.time_end);
-    const interval = req.body.interval;
+    const user_id = req.user.uid;
+    const timeStart = parseInt(req.query.time_start);
+    const timeEnd = parseInt(req.query.time_end);
+    const interval = req.query.interval;
 
     let bins;
     try {
-        bins = await getBins(req.body.bins, user_id)
+        bins = await getBins(req.query.bins, user_id)
     } catch (e) {
         return res.status(400).send(e)
     }

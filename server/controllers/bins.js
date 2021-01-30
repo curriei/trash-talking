@@ -35,11 +35,11 @@ const registerBin = async (req, res) => {
     if (bin.data().activated === true) return res.status(400).send('Bin has already been registered.');
 
     //Register bin.
-    const uid = req.uid.uid;
+    const user_id = req.user.uid;
 
     //Update firebase
     await binRef.update({
-        user_id: uid,
+        user_id: user_id,
         activated: true
     });
 
@@ -118,8 +118,8 @@ const binUpdate = async (req, res) => {
 
 //Get current bin fill level
 const current = async (req, res) => {
-    const user_id = req.uid.uid;
-    const binId = req.body.bin_id;
+    const user_id = req.user.uid;
+    const binId = req.query.bin_id;
 
     const bin = await db.collection('bins').doc(binId).get();
 

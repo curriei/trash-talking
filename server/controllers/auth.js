@@ -59,11 +59,11 @@ const loginUser = (req, res) => {
 };
 
 const verifyToken = (req, res, next) => {
-    const token = req.body.token;
+    const token = req.header('token');
     if (!token) return res.status(401).send('No token specified. Access denied.');
 
     try {
-        req.uid = jwt.verify(token, process.env.TOKEN_SECRET);
+        req.user = jwt.verify(token, process.env.TOKEN_SECRET);
         next();
     } catch (e) {
         res.status(400).send('Invalid token');
@@ -71,7 +71,7 @@ const verifyToken = (req, res, next) => {
 };
 
 const verifyAdmin = (req, res, next) => {
-    const adminPassword = req.body.admin_password;
+    const adminPassword = req.header('admin_password');
     if (!adminPassword) return res.status(401).send("No admin_password specified. Access denied.");
 
     if (adminPassword === process.env.ADMIN_PASSWORD) next();

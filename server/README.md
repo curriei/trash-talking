@@ -50,8 +50,9 @@ Logs user in and provides an auth token.
 
 ### GET /users/profile/
 Allows the viewing of any user's profile. Requires login token but any logged-in user can view any other user's profile. 
-#### Request Body
+#### Request Query
 * user_id: User ID of the viewed profile.
+#### Request Header
 * token: Login token.
 #### Result
 ```$xslt
@@ -67,7 +68,7 @@ Allows the viewing of any user's profile. Requires login token but any logged-in
 
 ### GET /users/bins
 Returns the details of all bins for the logged in user according to login token. Users can only view their own bins.
-#### Request Body
+#### Request Header
 * token: Login token.
 #### Result
 ```$xslt
@@ -107,7 +108,7 @@ Within bin objects:
 
 ### GET /users/goals
 Get the outstanding goals for the logged in user. Requires login, and users can only see their own goals.
-#### Request Body
+#### Request Header
 * token: login token.
 #### Result
 ```$xslt
@@ -131,9 +132,10 @@ Get the outstanding goals for the logged in user. Requires login, and users can 
 ### POST /users/goals/new
 Creates a new goal. Authentication required.
 #### Request Body
-* token: Login token.
 * goal_desc: Description of goal 
 * time_due: Due date of the goal in seconds since epoch time.
+#### Request Header
+* token: Login token.
 #### Result
 200
 #### Errors
@@ -163,6 +165,7 @@ Admin only endpoint, used whenever a bin is created and shipped out to customers
 Login required for this endpoint, registers a bin which was purchased with a specific account.  User needs to open and close the lid when the register (to get initial measurements of the bin).
 #### Request Body
 * bin_id: Bin ID from bin creation.
+#### Request Header
 * token: Token given by users/login endpoint.
 #### Result
 200 - Bin with id [BIN_ID] registered. 
@@ -185,8 +188,9 @@ Endpoint for a bin to send to whenever an update is required. Checks to see if b
 
 ### GET /bins/current
 Returns current weight and volume in bin.  Checks for login and that bin is owned by current user.
-#### Request Body
+#### Request Query
 * bin_id: Bin ID from bin creation.
+#### Request Header
 * token: token from user/login.
 #### Result
 ```
@@ -206,11 +210,12 @@ last_update: 1611099398517
 ## Garbage 
 ### GET /garbage/entries
 Returns all entries for the relevant bins between time_start and time_end.  Entries will be ordered in ascending order by time_stamp.
-#### Request Body
-* token: Login token.
+#### Request Query
 * time_start: Starting date for query.
 * time_end: Ending date for query.
 * bins: OPTIONAL, can be a list of binIDs to look for. If empty will just return entries for all bins registered to logged in user.
+#### Request Header
+* token: Login token.
 #### Result
 * 200 - 
 ```
@@ -242,11 +247,12 @@ Will always make periods outside of the bounds of the start/end time, but only i
 Let Ian know if you would like to talk more about this behaviour, happy to change it if there is a better way.
  
 #### Request Body
-* token: Login token
 * time_start: Start time for the query interval in microseconds since epoch time.
 * time_end: End time for the query interval in microseconds since epoch time.
 * interval: (OPTIONAL) One of [day, week, month, or year].  If anything else or left undefined, will default to not segmenting data (eg. giving sum of all weight and volume over entire period specified with time_start and time_end)
 * bins: OPTIONAL, can be a list of binIDs to look for. If empty will just return entries for all bins registered to logged in user.
+#### Request Header
+* token: Login token.
 
 #### Result
 200 - 
