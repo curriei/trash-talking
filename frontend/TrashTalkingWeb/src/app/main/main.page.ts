@@ -11,54 +11,21 @@ import Garbage from '../garbage';
   templateUrl: 'main.page.html',
   styleUrls: ['main.page.scss'],
 })
-export class MainPage {
-  entries: any;
-  chartData: any = null;
-  email: string;
-  password: string;
-  chartType: string = 'bar';
-  saleData = [
-    { name: "Mobiles", value: 105000 },
-    { name: "Laptop", value: 55000 },
-    { name: "AC", value: 15000 },
-    { name: "Headset", value: 150000 },
-    { name: "Fridge", value: 20000 }
-  ];
-  chartData2 = [
-    {
-      "name": "Nov 15-21",
-      "series": [
-        {
-          "name": "Sunday",
-          "value": 5
-        },
-        {
-          "name": "Monday",
-          "value": 10
-        },
-        {
-          "name": "Tuesday",
-          "value": 8
-        },
-        {
-          "name": "Wednesday",
-          "value": 17
-        },
-        {
-          "name": "Thursday",
-          "value": 12
-        },
-        {
-          "name": "Friday",
-          "value": 9
-        },
-        {
-          "name": "Saturday",
-          "value": 10
-        }
-      ]
-    }]
 
+export class MainPage {
+  fillPercentage = .3;
+  results = null; 
+  xAxisLabel = null;
+  legendTitle = null; 
+  yAxisLabel = null;
+  legend = false; 
+  showXAxisLabel = false;
+  showYAxisLabel = false;
+  xAxis = false;
+  yAxis = false;
+  gradient = false;
+
+  /*
   constructor(private router: Router, private menu: MenuController, private crudService: GarbageService) {}
 
   ngOnInit() {
@@ -78,12 +45,52 @@ export class MainPage {
       ];
     });
   }
+  
   openCustom() {
     this.menu.enable(true, 'custom');
     this.menu.open('custom');
   }
+  */
 
-  onGetData() {
-    console.log(this.entries);
+  fillTrash(percentage: any) {   //change to be 0-100
+    percentage = (percentage < 0) ? 0 : (percentage > 1) ? 1 : percentage;
+    document.getElementById("stop1").setAttribute("offset", percentage);
+    document.getElementById("stop2").setAttribute("offset", percentage);
+    console.log(document.getElementById("stop1").getAttribute("offset"));
+  }
+
+  onStatSelected(val: any) {
+    if (val!="today") {
+      this.legend = false; 
+      this.showXAxisLabel = true;
+      this.showYAxisLabel = true;
+      this.xAxis = true;
+      this.yAxis = true;
+      this.xAxisLabel = "Total Garbage (lb)";
+    }
+    if (val=="day") {
+      this.legendTitle = "Daily Statistics";
+      this.results = [
+        { name: "Mon", value: 1 },               // how do we do this
+        { name: "Tues", value: 5 },
+        { name: "Wed", value: 7 },
+        { name: "Thur", value: 3 },
+        { name: "Fri", value: 2 }
+      ];
+    }
+
+    if (val=="week") {
+      this.legendTitle = "Weekly Statistics";
+    }
+
+    if (val=="month") {
+      this.legendTitle = "Monthly Statistics";
+    }
+
+    if (val=="today") {
+      this.fillTrash(this.fillPercentage);
+    }
   }
 }
+
+
