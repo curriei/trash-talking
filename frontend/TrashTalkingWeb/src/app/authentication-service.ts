@@ -1,6 +1,6 @@
 import { Injectable, ɵCompiler_compileModuleSync__POST_R3__ } from '@angular/core';
 import { Router } from "@angular/router";
-import User from './User';
+import User from './user';
 import { AngularFireAuth } from "@angular/fire/auth";
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 

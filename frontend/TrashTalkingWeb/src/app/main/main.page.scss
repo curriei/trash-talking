@@ -28,3 +28,21 @@
 #container a {
   text-decoration: none;
 }
+
+ #trashcan-icon {
+  padding-top: 10px;
+  display: block;
+  margin-left: 5%
+ }
+
+ #trashcan-fill {
+  display: flex;
+  margin-top: -110px;
+  justify-content: center;
+  align-items: center;
+ }
+
+ ngx-charts-bar-horizontal {
+  display: block;
+  margin-left: -15%;
+}
