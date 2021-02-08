@@ -13,7 +13,6 @@
       <ion-item><a [routerLink]="['/profile']">Profile</a></ion-item>
       <ion-item><a [routerLink]="['/goals']">Goals</a></ion-item>
       <ion-item><a [routerLink]="['/search']">Search</a></ion-item>
-      <ion-item><a [routerLink]="['/insights']">Insights</a></ion-item>
       <ion-item><a [routerLink]="['/']">Log Out</a></ion-item>
     </ion-list>
   </ion-content>
@@ -31,8 +30,19 @@
     </ion-toolbar>
   </ion-header>
 
-    <div id="container" style="padding-top: 300px;">
-    <h1>Friend Requests</h1>
+    <div id="container" style="padding-top: 400px;">
+    <h1>Insights</h1>
+    <h2>A selection of insights based on your recent activity.</h2>
+    <ion-list *ngFor="let entry of entries">
+      <ion-item>
+        <div>
+        <h3>{{entry.Title}}<br></h3>
+        <p>{{entry.Desc}}</p>
+        <a href={{entry.link}}>Link</a>
+      </div>
+    </ion-item>
+    </ion-list>
+    <!--
     <p *ngIf="entries == null || entries.length == 0">You have no friend requests currently. Please check back later!</p>
     <ion-list *ngFor="let entry of entries">
       <ion-item>
@@ -48,6 +58,6 @@
         <img src="assets/images/usericon.png" width="30" height="30">
         <p> {{friend.user1_fname}} {{friend.user1_lname}}</p>
     </ion-item>
-    </ion-list>
+    </ion-list>-->
   </div>
 </div>

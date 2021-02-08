@@ -32,6 +32,10 @@ const routes: Routes = [
     loadChildren: () => import('./friends/friends.module').then( m => m.FriendsPageModule)
   },
   {
+    path: 'insights',
+    loadChildren: () => import('./insights/insights.module').then( m => m.InsightsPageModule)
+  },
+  {
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'

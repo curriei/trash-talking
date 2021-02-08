@@ -4,6 +4,7 @@ import Garbage from './garbage';
 import User from './user';
 import Goal from './goal';
 import Friend from './friend';
+import Insight from './insights';
 
 @Injectable({
   providedIn: 'root'
@@ -14,21 +15,28 @@ export class GarbageService {
   private dbPath2 = '/users';
   private dbpath3 = '/goals'
   private dbpath4 = '/friendships';
+  private dbpath5 = '/insights';
 
   garbageRef: AngularFirestoreCollection<Garbage> = null;
   userRef: AngularFirestoreCollection<User> = null
   goalsRef: AngularFirestoreCollection<Goal> = null;
   friendsRef: AngularFirestoreCollection<Friend> = null;
+  insightsRef: AngularFirestoreCollection<Insight> = null;
 
   constructor(private db: AngularFirestore) {
     this.garbageRef = db.collection(this.dbPath);
     this.userRef = db.collection(this.dbPath2);
     this.goalsRef = db.collection(this.dbpath3);
     this.friendsRef = db.collection(this.dbpath4);
+    this.insightsRef = db.collection(this.dbpath5);
   }
 
   addFriend(friend: Friend): any {
     return this.friendsRef.add({ ...friend })
+  }
+
+  getAllInsights(): AngularFirestoreCollection<Insight> {
+    return this.insightsRef;
   }
 
   getAllFriends(): AngularFirestoreCollection<Friend> {
