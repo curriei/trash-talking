@@ -11,7 +11,6 @@
     <ion-list>
       <ion-item><a [routerLink]="['/main']">Main</a></ion-item>
       <ion-item><a [routerLink]="['/goals']">Goals</a></ion-item>
-      <ion-item><a [routerLink]="['/search']">Search</a></ion-item>
       <ion-item><a [routerLink]="['/friends']">Friends</a></ion-item>
       <ion-item><a [routerLink]="['/insights']">Insights</a></ion-item>
       <ion-item><a [routerLink]="['/']">Log Out</a></ion-item>
@@ -33,12 +32,20 @@
 
     <ion-content [fullscreen]="true">
     <div id="container">
-    <img src="assets/images/trashcanicon.png" width="120" height="120">
-    <h1>Welcome back {{ this.fname }}!</h1>
-    <h2>Profile Information</h2>
-    <p><b>Name:</b> {{ this.fname }} {{ this.lname }}</p>
-    <p><b>Email:</b> {{ this.email }}</p>
-    <p><b>Date Joined:</b> {{ this.date_joined }}</p>
+    <h1>Search for Users</h1>
+    <ion-item>
+      <ion-label>Search Query</ion-label>
+      <ion-input [(ngModel)]="query" placeholder="search by email"></ion-input>
+      <ion-button (click)="searchUsers()" color="primary">Search</ion-button>
+    </ion-item>
+    <h2 *ngIf="entries != null">Search Results:</h2>
+    <ion-list *ngFor="let entry of entries">
+      <ion-item>
+        <img src="assets/images/usericon.png" width="30" height="30">
+        <p> {{entry.First_name}} {{entry.Last_name}}</p>
+        <ion-button *ngIf="sent == false" (click)="addFriend()" color="primary">Add Friend</ion-button>
+    </ion-item>
+    </ion-list>
   </div>
   </ion-content>
 </div>
