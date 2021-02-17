@@ -35,7 +35,13 @@ export class GoalsPage {
         )
       )
     ).subscribe(data => {
-      this.goals = data;
+      this.goals = [];
+      for (var i =0; i < data.length; i++){
+        if (data[i]["user_id"] == "0"){
+          this.goals.push(data[i]);
+        }
+      }
+      console.log(this.goals);
     });
   }
 
@@ -50,7 +56,13 @@ export class GoalsPage {
         )
       )
     ).subscribe(data => {
-      this.goals = data;
+      this.goals = [];
+      for (var i =0; i < data.length; i++){
+        if (data[i]["user_id"] == "0"){
+          this.goals.push(data[i]);
+        }
+      }
+      console.log(this.goals);
     });
   }
 }
