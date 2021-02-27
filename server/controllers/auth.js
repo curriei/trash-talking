@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const {admin} = require('../firebase/fb.js');
+const {admin, db} = require('../firebase/fb.js');
 const axios = require('axios');
 
 
@@ -7,26 +7,38 @@ const createUser = async (req, res) => {
 
     //Json manipulation
     const body = req.body;
-    const user_id = body.user_id;
-    const displayName = body.name;
+    const userId = body.user_id;
+    const firstName = body.first_name;
+    const lastName = body.last_name;
     const email = body.email;
     const password = body.password;
+    const joined = new Date().getTime();
+
+    if (userId === undefined)
+        res.status(400).send('User ID is undefined');
+
 
     admin.auth().createUser({
-        uid: user_id,
-        username: user_id,
+        uid: userId,
         email: email,
         emailVerified: false,
         password: password,
-        displayName: displayName,
         disabled: false
     })
         .then(
-            (userRecord) => {
+            async (userRecord) => {
+
+                const userRef = db.collection('users').doc(userId);
+                await userRef.set({
+                    first_name: firstName,
+                    last_name: lastName,
+                    joined: joined,
+                });
+
                 console.log("New user created:", userRecord.uid);
                 res.status(200).json({
                     action: "Success",
-                    description: `User ${user_id} created.`
+                    description: `User ${userId} created.`
                 });
             })
         .catch(
@@ -39,6 +51,18 @@ const createUser = async (req, res) => {
 
 const loginUser = (req, res) => {
     const url = `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${process.env.GOOGLE_API_KEY}`;
+
+    if (req.body.email === undefined)
+        return res.status(400).json({
+            action: "Failed",
+            description: "Email undefined"
+        });
+    if (req.body.password === undefined)
+        return res.status(400).json({
+            action: "Failed",
+            description: "Password undefined"
+        });
+
     axios.post(url, {
         email: req.body.email,
         password: req.body.password
@@ -54,7 +78,10 @@ const loginUser = (req, res) => {
         })
         .catch(error => {
             console.log("Invalid login attempt:", error);
-            res.status(400).send("Invalid credentials provided.");
+            res.status(400).json({
+                action: "Failed",
+                description: "Invalid credentials"
+            });
         });
 };
 

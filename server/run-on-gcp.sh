@@ -12,7 +12,6 @@ echo "+----------------------------------------------------------------------+"
 
 gcloud beta run deploy --image gcr.io/${PROJECT_ID}/${BUILD_NAME} --platform managed
 
-
 #When build is completed, some options may come up.  If so, do the following:
 #Service name: Type the name of the service, for us, I am using trash-talking
 #Please choose a target platform: select 1 (Cloud Run (fully managed))
