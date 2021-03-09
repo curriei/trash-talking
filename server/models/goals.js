@@ -51,7 +51,7 @@ const updateAveValueGoals = async (goal, volume, weight, type) => {
 
     } else {
         if (type === "weight")
-            progress = goal.data().progress + weight;
+            progress = parseFloat(goal.data().progress) + weight;
         else if (type === "volume")
             progress = goal.data().progress + volume;
         else {
@@ -206,8 +206,9 @@ const categories = {
 const updateGoals = async (userId, volume, weight, updateId) => {
     const goals1 = await db.collection('goals').where('user_id', '==', userId).where('status', '==', 'On track').get();
     const goals2 = await db.collection('goals').where('user_id', '==', userId).where('status', '==', 'Not on track').get();
-    const goals = goals1.concat(goals2);
-    for (const goal of goals) {
+
+
+    goals1.forEach(async (goal) => {
         //Handle goal update based on the category which the given goal has.
         await categories[goal.data().category]['update'](goal, volume, weight);
         const updates = goal.data().updates;
@@ -215,7 +216,16 @@ const updateGoals = async (userId, volume, weight, updateId) => {
         await db.collection('goals').doc(goal.id).update({
             updates: updates
         });
-    }
+    });
+    goals2.forEach(async (goal) => {
+        //Handle goal update based on the category which the given goal has.
+        await categories[goal.data().category]['update'](goal, volume, weight);
+        const updates = goal.data().updates;
+        updates.push(updateId);
+        await db.collection('goals').doc(goal.id).update({
+            updates: updates
+        });
+    });
 };
 
 module.exports = {updateGoals, categories};

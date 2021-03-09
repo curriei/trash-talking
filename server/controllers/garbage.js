@@ -62,41 +62,139 @@ const garbageEntries = async (req, res) => {
     const timeStart = parseInt(req.query.time_start);
     const timeEnd = parseInt(req.query.time_end);
 
+    if (isNaN(timeStart) || isNaN(timeEnd))
+        return res.status(400).json({action: "Failed", description: "Time constraints not specified or incorrect."});
+
     let bins;
     try {
         bins = await getBins(req.query.bins, user_id)
     } catch (e) {
-        return res.status(400).send(e)
+        return res.status(400).json({
+            action: "Failure",
+            description: "Error while finding bins to use",
+            error: e
+        })
     }
 
-    const entries = await performQuery(bins, timeStart, timeEnd);
-
-    if (entries.length === 0) {
-        return res.status(200).send("No data entries found.");
+    try {
+        const entries = await performQuery(bins, timeStart, timeEnd);
+        if (entries.length === 0) {
+            return res.status(200).json({
+                action: "Success",
+                description: "No data entries found."
+            });
+        }
+        res.status(200).json({
+            action: "Success",
+            num_entries: entries.length,
+            data: entries
+        });
+    } catch (err) {
+        console.log("Uncaught error in /garbage/entries: ", err);
+        res.status(500).json({
+            action: "Failure",
+            description: "Uncaught error, likely due to firestore.",
+            error: err
+        })
     }
-    res.status(200).json({
-        num_entries: entries.length,
-        data: entries
-    });
 };
 
 
 //Returns totals for the amount per increment
 const garbageQuery = async (req, res) => {
-    const user_id = req.user.uid;
+    const userId = req.user.uid;
     const timeStart = parseInt(req.query.time_start);
     const timeEnd = parseInt(req.query.time_end);
     const interval = req.query.interval;
 
     let bins;
     try {
-        bins = await getBins(req.query.bins, user_id)
+        bins = await getBins(req.query.bins, userId)
     } catch (e) {
-        return res.status(400).send(e)
+        return res.status(400).json({
+            action: "Failure",
+            description: "Error determining bins to query",
+            error: e
+        });
     }
 
-    const entries = await performQuery(bins, timeStart, timeEnd);
-    if (entries.length === 0) return res.status(400).send('No data entries found.');
+    try {
+        const entries = await performQuery(bins, timeStart, timeEnd);
+        if (entries.length === 0) return res.status(400).json({
+            action: "Failure",
+            description: 'No data entries found.'
+        });
+
+        const result = organizeDataForQuery(timeStart, timeEnd, interval, entries);
+
+        res.status(200).json(result);
+    } catch (err) {
+        console.log("Uncaught error in /garbage/query: ", err);
+        res.status(500).json({
+            action: "Failure",
+            description: "Uncaught error, likely due to firestore.",
+            error: err
+        })
+    }
+};
+
+//Specifically for accessing a query shared by another user.
+const sharedQuery = async (req, res) => {
+    const userId = req.user.uid;
+    const shareId = req.query.share_id;
+
+    if (!shareId)
+        return res.status(400).json({action: "Failed", description: "Field share_id in query must not be undefined."});
+    const share = await db.collection("shares").doc(shareId).get();
+    if (!share.exists)
+        return res.status(400).json({action: "Failed", description: "Shared query not found."});
+    if (share.data().shared_with !== userId && share.data().sharing_user !== userId)
+        return res.status(400).json({action: "Failed", description: "User not allowed to view this shared query."});
+    if (share.data().shared_with === userId) {
+        await db.collection("shares").doc(shareId).update({
+            status: "Viewed"
+        });
+    }
+
+    const timeStart = share.data().time_start;
+    const timeEnd = share.data().time_end;
+    const interval = share.data().interval;
+    const sharingUser = share.data().sharing_user;
+    const attemptedBins = share.data().bins;
+
+    let bins;
+    try {
+        bins = await getBins(attemptedBins, sharingUser)
+    } catch (e) {
+        return res.status(400).json({
+            action: "Failure",
+            description: "Error determining bins to query",
+            error: e
+        })
+    }
+
+    try {
+        const entries = await performQuery(bins, timeStart, timeEnd);
+        if (entries.length === 0) return res.status(400).json({
+            action: "Failure",
+            description: 'No data entries found.'
+        });
+
+        const result = organizeDataForQuery(timeStart, timeEnd, interval, entries);
+
+        res.status(200).json(result);
+    } catch (err) {
+        console.log("Uncaught error in /garbage/query/shared: ", err);
+        res.status(500).json({
+            action: "Failure",
+            description: "Uncaught error, likely due to firestore.",
+            error: err
+        })
+    }
+
+};
+
+const organizeDataForQuery = (timeStart, timeEnd, interval, entries) => {
 
     const queryInterval = {start: new Date(timeStart), end: new Date(timeEnd)};
     let subIntervalBreaks = [];
@@ -184,8 +282,7 @@ const garbageQuery = async (req, res) => {
         };
         result['num_intervals']++;
     }
-
-    res.status(200).json(result);
+    return result;
 };
 
-module.exports = {garbageEntries, garbageQuery};
+module.exports = {garbageEntries, garbageQuery, sharedQuery};

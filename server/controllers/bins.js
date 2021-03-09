@@ -4,23 +4,40 @@ const goalModels = require('../models/goals.js');
 
 const createBin = async (req, res) => {
     const body = req.body;
-    let binArea = body.bin_area;
-    if (binArea === undefined)
-        binArea = Math.pow((body.diameter / 2.0), 2) * Math.PI;
+    let binArea = parseFloat(body.area);
+    const diameter = body.diameter;
 
-    if (binArea < 0) return res.status(400).send('Bin area must be greater than 0');
+    try {
 
-    const binId = uuidv4();
-    await db.collection('bins').doc(binId).set({
-        activated: false,
-        bin_area: binArea
-    });
-    console.log('Bin created with ID:', binId);
-    res.status(200).json({
-        status: "success",
-        message: "Bin created",
-        bin_id: binId
-    });
+        if (isNaN(binArea)) {
+            if (diameter === undefined)
+                return res.status(400).json({action: "Failed", description: "diameter or area must be defined."});
+            binArea = Math.pow((parseFloat(diameter) / 2.0), 2) * Math.PI;
+        }
+        if (binArea < 0) return res.status(400).json({
+            action: "Failure",
+            description: 'Bin area must be greater than 0'
+        });
+
+        const binId = uuidv4();
+        await db.collection('bins').doc(binId).set({
+            activated: false,
+            bin_area: binArea
+        });
+        console.log('Bin created with ID:', binId);
+        res.status(200).json({
+            action: "Success",
+            description: "Bin created",
+            bin_id: binId
+        });
+    } catch (err) {
+        console.log("Uncaught error in /bins/new: ", err);
+        res.status(500).json({
+            action: "Failure",
+            description: "Uncaught error.",
+            error: err
+        })
+    }
 };
 
 //Register bin with user account.  User must still "update bin" by opening lid.
@@ -30,22 +47,41 @@ const registerBin = async (req, res) => {
     const binId = body.bin_id;
     const binRef = db.collection('bins').doc(binId);
 
-    //Check if bin was created.
-    const bin = await binRef.get();
-    if (!bin.exists) return res.status(400).send("Bin does not exist.");
-    if (bin.data().activated === true) return res.status(400).send('Bin has already been registered.');
+    try {
 
-    //Register bin.
-    const userId = req.user.uid;
+        //Check if bin was created.
+        const bin = await binRef.get();
+        if (!bin.exists) return res.status(400).json({
+            action: "Failure",
+            description: "Bin does not exist."
+        });
+        if (bin.data().activated === true) return res.status(400).json({
+            action: "Failure",
+            description: 'Bin has already been registered.'
+        });
 
-    //Update firebase
-    await binRef.update({
-        user_id: userId,
-        activated: true
-    });
+        //Register bin.
+        const userId = req.user.uid;
 
-    console.log(`Bin with ID ${binId} registered.`);
-    res.status(200).send(`Bin with ID ${binId} registered.`);
+        //Update firebase
+        await binRef.update({
+            user_id: userId,
+            activated: true
+        });
+
+        console.log(`Bin with ID ${binId} registered.`);
+        res.status(200).json({
+            action: "Success",
+            description: `Bin with ID ${binId} registered.`
+        });
+    } catch (err) {
+        console.log("Uncaught error in /bins/register: ", err);
+        return res.status(500).json({
+            action: "Failed",
+            description: "Uncaught error",
+            error: err
+        });
+    }
 };
 
 //Called by bin controller to update server values
@@ -58,8 +94,18 @@ const binUpdate = async (req, res) => {
     const distance = parseFloat(body.distance);
     const timeStamp = new Date().getTime();
 
-    if (isNaN(distance) || typeof distance !== 'number') return res.status(400).send("Distance must be a number");
-    if (isNaN(weight) || typeof weight !== 'number') return res.status(400).send('Weight must be a number');
+    if (binId === undefined)
+        return res.status(400).json({action: "Failed", description: "bin_id is undefined."});
+
+    if (isNaN(distance) || typeof distance !== 'number') return res.status(400).json({
+        action: "Failed",
+        description: "Distance must be a number."
+    });
+    if (isNaN(weight) || typeof weight !== 'number') return res.status(400).json({
+        action: "Failed",
+        description: 'Weight must be a number.'
+    });
+
 
     //Get bin data and check if exists
     let binDocRef;
@@ -68,55 +114,77 @@ const binUpdate = async (req, res) => {
         binDocRef = db.collection('bins').doc(binId);
         bin = await binDocRef.get();
     } catch (e) {
-        return res.status(400).send(`Error accessing database: ${e}`);
+        console.log("Uncaught error in /bins/update: ", e);
+        return res.status(500).json({
+            action: "Failed",
+            description: "Uncaught error when accessing bin on database",
+            error: e
+        });
     }
     if (!bin.exists) {
-        return res.status(400).send("Bin does not exist");
+        return res.status(400).json({
+            action: "Failed",
+            description: "Bin does not exist"
+        });
     }
 
-    //Update bin data, including checking if bin has had any updates in the past yet.
-    let lastWeight = bin.data().last_weight;
-    let lastDistance = bin.data().last_distance;
-    if (lastWeight === undefined) {
-        binDocRef.update({
-            last_weight: weight,
-            last_distance: distance,
-            bin_weight: weight,
-            bin_distance: distance,
-            last_update: timeStamp
-        });
-        lastDistance = distance;
-        lastWeight = weight;
-    } else {
-        binDocRef.update({
-            last_weight: weight,
-            last_distance: distance,
-            last_update: timeStamp
+    try {
+        //Update bin data, including checking if bin has had any updates in the past yet.
+        let lastWeight = bin.data().last_weight;
+        let lastDistance = bin.data().last_distance;
+        if (lastWeight === undefined) {
+            binDocRef.update({
+                last_weight: weight,
+                last_distance: distance,
+                bin_weight: weight,
+                bin_distance: distance,
+                last_update: timeStamp
+            });
+            lastDistance = distance;
+            lastWeight = weight;
+        } else {
+            binDocRef.update({
+                last_weight: weight,
+                last_distance: distance,
+                last_update: timeStamp
+            })
+        }
+
+        //Calculate delta values for garbage update.
+        const deltaWeight = weight - lastWeight;
+        // Negative because distance is measured from top of bin.
+        const deltaDistance = lastDistance - distance;
+        //volume measured in cubic metres, bin area is square mm.
+        const deltaVolume = deltaDistance * bin.data().bin_area / 1000000000;
+
+        // Only record a garbage update if garbage was added (avoid bag removal)
+        if (deltaWeight >= 0) {
+            const docRef = db.collection('data-entries').doc(updateId);
+            await docRef.set({
+                bin_id: binId,
+                weight: deltaWeight,
+                volume: deltaVolume,
+                time_stamp: timeStamp
+            });
+
+            await goalModels.updateGoals(bin.data().user_id, deltaVolume, deltaWeight, updateId);
+            res.status(200).json({
+                action: "Success",
+                description: `${deltaWeight} weight and ${deltaVolume} volume added for bin: ${binId}`
+            });
+        } else {
+            res.status(200).json({
+                action: "Success",
+                description: 'Bag removed, no garbage recorded.'
+            });
+        }
+    } catch (err) {
+        console.log("Uncaught error in /bins/update: ", err);
+        res.status(500).json({
+            action: "Failure",
+            description: "Uncaught error, likely due to firestore issues",
+            error: err
         })
-    }
-
-    //Calculate delta values for garbage update.
-    const deltaWeight = weight - lastWeight;
-    // Negative because distance is measured from top of bin.
-    const deltaDistance = lastDistance - distance;
-    const deltaVolume = deltaDistance * bin.data().bin_area;
-
-    // Only record a garbage update if garbage was added (avoid bag removal)
-    if (deltaWeight >= 0) {
-        const docRef = db.collection('data-entries').doc(updateId);
-        await docRef.set({
-            bin_id: binId,
-            weight: deltaWeight,
-            volume: deltaVolume,
-            time_stamp: timeStamp
-        });
-
-        await goalModels.updateGoals(bin.data().user_id, deltaVolume, deltaWeight, updateId);
-
-
-        res.status(200).send(`${deltaWeight} weight and ${deltaVolume} volume added for bin: ${binId}`);
-    } else {
-        res.status(200).send('Bag removed, no garbage recorded.');
     }
 };
 
@@ -125,28 +193,49 @@ const current = async (req, res) => {
     const userId = req.user.uid;
     const binId = req.query.bin_id;
 
-    const bin = await db.collection('bins').doc(binId).get();
+    try {
+        const bin = await db.collection('bins').doc(binId).get();
 
-    //Check if bin exists
-    if (!bin.exists) {
-        return res.status(400).send("Bin does not exist");
-    }
-    //Check if bin matches registered user.
-    if (bin.data().user_id !== userId) {
-        return res.status(400).send('Bin does not belong to this user.');
-    }
-    //Check if bin has any data relating to it
-    if (bin.data().bin_weight === undefined) {
-        return res.status(400).send("Bin has never been updated.");
-    }
-    const currentWeight = bin.data().last_weight - bin.data().bin_weight;
-    const currentVolume = (bin.data().bin_distance - bin.data().last_distance) * bin.data().bin_area;
+        //Check if bin exists
+        if (!bin.exists) {
+            return res.status(400).json({
+                action: "Failure",
+                description: "Bin does not exist"
+            });
+        }
+        //Check if bin matches registered user.
+        if (bin.data().user_id !== userId) {
+            return res.status(400).json({
+                action: "Failure",
+                description: 'Bin does not belong to this user.'
+            });
+        }
+        //Check if bin has any data relating to it
+        if (bin.data().bin_weight === undefined) {
+            return res.status(400).json({
+                action: "Failure",
+                description: "Bin has never been updated."
+            });
+        }
+        const currentWeight = bin.data().last_weight - bin.data().bin_weight;
+        const currentVolume = (bin.data().bin_distance - bin.data().last_distance) * bin.data().bin_area;
+        const percentFill = currentVolume / (bin.data().bin_area * bin.data().bin_distance);
 
-    res.status(200).json({
-        current_weight: currentWeight,
-        current_volume: currentVolume,
-        last_update: bin.data().last_update
-    });
+        res.status(200).json({
+            action: "Success",
+            current_weight: currentWeight,
+            current_volume: currentVolume,
+            percent_fill: percentFill,
+            last_update: bin.data().last_update
+        });
+    } catch (err) {
+        console.log("Uncaught error in /bins/current: ", err);
+        res.status(500).json({
+            action: "Failure",
+            description: "Uncaught error, likely due to firestore.",
+            error: err
+        })
+    }
 };
 
 module.exports = {registerBin, createBin, binUpdate, current};

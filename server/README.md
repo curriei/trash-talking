@@ -25,7 +25,8 @@ Creates a new user.
 * user_id: Unique user id
 * email: Email (does need to be unique)
 * password: Password
-* name: Display name (does not need to be unique)
+* first_name: First name of user
+* last_name: Last name of user
 #### Result
 200
 #### Errors
@@ -146,7 +147,7 @@ Creates a new goal. Authentication required.
 Admin only endpoint, used whenever a bin is created and shipped out to customers.  Bin ID would have to be included in the box for the user to use to register bin.  This will be changing shortly for security.
 #### Request Body
 * diameter: (Alternative to bin_area) Measured diameter of bin, used to calculate bin_area (assuming bin is cylindrical) and in volume calculations.
-* bin_area: (Alternative to diameter) Measured area of bottom of horizontal cross section of bin.  Used in volume calculations.
+* area: (Alternative to diameter) Measured area of bottom of horizontal cross section of bin.  Used in volume calculations.
 * admin_password: Admin password as irresponsibly included in .env file.
 #### Result
 200 - 

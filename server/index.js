@@ -31,7 +31,3 @@ const port = process.env.PORT || 8080;
 app.listen(port, () => {
     console.log(`Listening on port ${port}`);
 });
-
-//TODO: VerifyBin/admin auth function
-//TODO: units!
-//TODO: firebase indexing/rules
