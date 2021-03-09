@@ -91,6 +91,16 @@ const newInsight = async (req, res) => {
     const startsNum = req.body.starts;
     const expiresNum = req.body.expires;
     const insightCreated = new Date().getTime();
+    let insightLink = req.body.link;
+    const insightTitle = req.body.title;
+
+    if (insightText === undefined || insightTitle === undefined)
+        return res.status(400).json({
+            action: "Failure",
+            description: "No text or title provided."
+        });
+    if (insightLink === undefined)
+        insightLink = "";
 
     try {
         const starts = new Date(parseInt(startsNum)).getTime();
@@ -99,7 +109,9 @@ const newInsight = async (req, res) => {
             expires: expires,
             starts: starts,
             text: insightText,
-            created: insightCreated
+            link: insightLink,
+            created: insightCreated,
+            title: insightTitle
         });
         res.status(200).json({
             action: "Success",
