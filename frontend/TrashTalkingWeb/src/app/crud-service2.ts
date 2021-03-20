@@ -98,6 +98,14 @@ export class GarbageService {
     return this.http.get<any>(url, { headers })
   }
 
+  getBins(): any {
+    var token = localStorage.getItem('id_token');
+    var url = "https://trash-talking-mksvgldida-uc.a.run.app/users/bins/";
+    console.log(token);
+    const headers = {'token': token };
+    return this.http.get<any>(url, { headers })
+  }
+
   getAll(): AngularFirestoreCollection<Garbage> {
     console.log(this.garbageRef);
     return this.garbageRef;

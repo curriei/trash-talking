@@ -25,8 +25,17 @@ export class MainPage {
   yAxis = false;
   gradient = false;
 
-  /*
   constructor(private router: Router, private menu: MenuController, private crudService: GarbageService) {}
+
+  ngOnInit() {
+    //This is calling the bins endpoint
+    /*
+    this.crudService.getBins().subscribe(data => {
+      console.log(data);
+    });*/
+  }
+  /*
+  
 
   ngOnInit() {
     console.log(this.crudService.getAll().snapshotChanges());
