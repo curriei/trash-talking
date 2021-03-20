@@ -11,6 +11,7 @@
     <ion-list>
       <ion-item><a [routerLink]="['/main']">Main</a></ion-item>
       <ion-item><a [routerLink]="['/goals']">Goals</a></ion-item>
+      <ion-item><a [routerLink]="['/search']">Search</a></ion-item>
       <ion-item><a [routerLink]="['/friends']">Friends</a></ion-item>
       <ion-item><a [routerLink]="['/insights']">Insights</a></ion-item>
       <ion-item><a [routerLink]="['/']">Log Out</a></ion-item>
@@ -30,22 +31,23 @@
     </ion-toolbar>
   </ion-header>
 
-    <ion-content [fullscreen]="true">
-    <div id="container">
-    <h1>Search for Users</h1>
+  <ion-content [fullscreen]="true">
+  <div id="container">
+    <h1>Register Bin</h1>
+    <p>If you are a first time user, or have purchased a new bin, you need to register the bin before TrashTalking can track your usage.</p>
+    <h2>Where Is the Bin ID?</h2>
+    <p>The bin ID is located on the sticker that comes with the TrashTalking Kit</p>
+    <h2>I cannot find the sticker/I have lost the sticker</h2>
+    <p>If your kit did not come with a sticker, or you have lost it, you need to contact support.</p>
     <ion-item>
-      <ion-label>Search Query</ion-label>
-      <ion-input [(ngModel)]="query" placeholder="search by email"></ion-input>
-      <ion-button (click)="searchUsers()" color="primary">Search</ion-button>
+      <ion-label>Bin ID</ion-label>
+      <ion-input [(ngModel)]="binid" placeholder="123456789"></ion-input>
     </ion-item>
-    <h2 *ngIf="entries != null">Search Results:</h2>
-    <ion-list *ngFor="let user of users">
-      <ion-item>
-        <img src="assets/images/usericon.png" width="30" height="30">
-        <p> {{user.first_name}} {{user.last_name}}</p>
-        <ion-button *ngIf="sent == false" (click)="addFriend(user.userid)" color="primary">Add Friend</ion-button>
-    </ion-item>
-    </ion-list>
+    <ion-button (click)="onRegisterBin()" color="primary">Register Bin</ion-button>
+    <p *ngIf="register == 'failed'" style="color: red;">Invalid bin number. Please try again.</p>
+    <p *ngIf="register == 'unresponsive'" style="color: red;">We cannot process your request at this time. Please try again later</p>
   </div>
   </ion-content>
+    
+
 </div>

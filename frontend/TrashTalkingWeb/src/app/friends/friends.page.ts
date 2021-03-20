@@ -9,70 +9,50 @@ import Friend from '../friend';
   styleUrls: ['friends.page.scss'],
 })
 export class FriendsPage {
+  requests: any = null;
+  friends: any = null;
   entries: any = null;
   current: any = null;
 
   constructor(private crudService: GarbageService) {}
 
-  ngOnInit() {
-    this.crudService.getAllFriends().snapshotChanges().pipe(
-      map(changes =>
-        changes.map(c =>
-          ({ id: c.payload.doc.id, ...c.payload.doc.data() })
-        )
-      )
-    ).subscribe(data => {
-      var filteredData = [];
-      var filteredData2 = [];
-      for (var i = 0; i < data.length; i++){
-        if (data[i]["user2"] == "fakeemail123@gmail.com" && data[i]["status"] == 1){
-          filteredData.push(data[i]);
-        }
-        if (data[i]["user2"] == "fakeemail123@gmail.com" && data[i]["status"] == 2){
-          filteredData2.push(data[i]);
-        }
-      }
-      this.entries = filteredData;
-      this.current = filteredData2
+  fetchInfo() {
+    this.crudService.getIncomingFriendRequests().subscribe(data => {
+      var request_list = [];
+      Object.keys(data).forEach(function(key) {
+        var request = data[key];
+        request.request_id = key;
+        request.request_time = new Date(request.request_time);
+        request_list.push(request);
+     });
+    this.requests = request_list;
     });
+    this.crudService.getFriends().subscribe(data => {
+      var friends_list = [];
+      Object.keys(data).forEach(function(key) {
+        var friend = data[key];
+        friend.request_id = key;
+        friend.friends_since = new Date(friend.friends_since);
+        friends_list.push(friend);
+     });
+    this.friends = friends_list;
+    });
+  }
+  ngOnInit() {
+    this.fetchInfo();
   }
 
-  confirmFriend(entry: any) {
-    entry.status = 2;
-    this.crudService.updateFriend(entry.id, entry).then(res => console.log("It worked!")).catch(error => console.log("It didn't work"));
-  }
- /*
-  addFriend() {
-    var new_friend = new Friend();
-    new_friend.status = 1;
-    new_friend.user1 = "sampleemail@gmail.com"
-    new_friend.user2 = "testemail123@gmail.com"
-    this.crudService.addFriend(new_friend);
-  }
-  searchUsers(){
-    this.crudService.getAllUsers().snapshotChanges().pipe(
-      map(changes =>
-        changes.map(c =>
-          ({ id: c.payload.doc.id, ...c.payload.doc.data() })
-        )
-      )
-    ).subscribe(data => {
-      var filteredData = [];
-      for (var i = 0; i < data.length; i++) {
-        if (data[i]["email"] == this.query){
-          filteredData.push(data[i])
-        }
-      }
-      this.entries = filteredData;
-      console.log(this.entries);
-      */
-      /*
-      var user = filteredData[0];
-      this.email = user["email"];
-      this.fname = user["First_name"];
-      this.lname = user["Last_name"];
-      this.date_joined = user["Date_Joined"];*/
-      /*
+  confirmFriend(request_id) {
+    this.crudService.acceptFriendRequest(request_id).subscribe(data => {
+      console.log(data);
     });
-  }*/
+    this.fetchInfo();
+  }
+  
+  denyFriend(request_id){
+    this.crudService.denyFriendRequest(request_id).subscribe(data => {
+      console.log(data);
+    });
+    this.fetchInfo();
+  }
 }

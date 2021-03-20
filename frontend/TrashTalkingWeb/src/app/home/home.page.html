@@ -25,6 +25,8 @@
     </ion-item>
     <ion-button (click)="onLogin()" color="primary">Log In</ion-button>
     <ion-button [routerLink]="['/signup']" color="primary">Sign Up</ion-button>
+    <p *ngIf="login == 'failed'" style="color: red;">Invalid username and/or password.</p>
+    <p *ngIf="login == 'unresponsive'" style="color: red;">We cannot process your request at this time. Please try again later</p>
   </div>
-  <p *ngIf="login == 'failed'">Login failed. Incorrect credentials.</p>
 </ion-content>
+<!--*ngIf="login == 'failed'"-->

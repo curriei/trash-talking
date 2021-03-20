@@ -16,6 +16,10 @@
   <div id="container">
     <strong>Sign Up</strong>
     <ion-item>
+      <ion-label>Username</ion-label>
+      <ion-input [(ngModel)]="uname" placeholder="username"></ion-input>
+    </ion-item>
+    <ion-item>
       <ion-label>First Name</ion-label>
       <ion-input [(ngModel)]="fname" placeholder="first name"></ion-input>
     </ion-item>
@@ -32,5 +36,6 @@
       <ion-input [(ngModel)]="password" placeholder="password" type="password"></ion-input>
     </ion-item>
     <ion-button (click)="onSignUp()" color="primary">Sign Up</ion-button>
+    <p *ngIf="status == 'fail'" style="color: red;">We cannot process your request at this time. Please try again later.</p>
   </div>
 </ion-content>

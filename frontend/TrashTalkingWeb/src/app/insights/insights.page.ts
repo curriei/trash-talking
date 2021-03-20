@@ -10,10 +10,20 @@ import Friend from '../friend';
 })
 export class InsightsPage {
   entries: any = null;
+  insights: any = null;
 
   constructor(private crudService: GarbageService) {}
 
   ngOnInit() {
+    this.crudService.getInsights().subscribe(data => {
+      var insight_list = [];
+      Object.keys(data["insights"]).forEach(function(key) {
+        var insight = data["insights"][key];
+        insight_list.push(insight);
+    });
+    this.insights = insight_list;
+  });
+    /*
     this.crudService.getAllInsights().snapshotChanges().pipe(
       map(changes =>
         changes.map(c =>
@@ -23,7 +33,7 @@ export class InsightsPage {
     ).subscribe(data => {
       this.entries = data;
       console.log(this.entries)
-    });
+    });*/
   }
  /*
   addFriend() {

@@ -9,6 +9,7 @@ import Friend from '../friend';
   styleUrls: ['search.page.scss'],
 })
 export class SearchPage {
+  users: any = null;
   entries: any;
   email: string;
   fname: string;
@@ -21,17 +22,22 @@ export class SearchPage {
 
   ngOnInit() {}
 
-  addFriend() {
-    this.sent = true;
-    var new_friend = new Friend();
-    new_friend.status = 1;
-    new_friend.user1 = "sampleemail@gmail.com";
-    new_friend.user1_fname = "Alexie";
-    new_friend.user1_lname = "McDonald";
-    new_friend.user2 = "fakeemail123@gmail.com";
-    this.crudService.addFriend(new_friend);
+  addFriend(userid) {
+    this.crudService.sendFriendRequest(userid).subscribe(data => {
+      console.log(data);
+    });
   }
   searchUsers(){
+    this.crudService.searchUsers(this.query).subscribe(data => {
+      var users_list = [];
+      Object.keys(data).forEach(function(key) {
+        var user = data[key];
+        user.userid = key;
+        users_list.push(user);
+     });
+    this.users = users_list;
+    });
+    /*
     this.crudService.getAllUsers().snapshotChanges().pipe(
       map(changes =>
         changes.map(c =>
@@ -47,12 +53,14 @@ export class SearchPage {
       }
       this.entries = filteredData;
       console.log(this.entries);
+      */
       /*
       var user = filteredData[0];
       this.email = user["email"];
       this.fname = user["First_name"];
       this.lname = user["Last_name"];
       this.date_joined = user["Date_Joined"];*/
-    });
+      /*
+    });*/
   }
 }

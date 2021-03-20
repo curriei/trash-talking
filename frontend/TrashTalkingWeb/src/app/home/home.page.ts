@@ -14,11 +14,14 @@ export class HomePage {
   constructor(private authService: AuthenticationService, private router: Router) {}
 
   onLogin() {
-    console.log(this.email);
-    console.log(this.password);
-    this.authService.SignIn(this.email, this.password).then(() => {
-      this.router.navigate(['/main'])
-    }).catch(() => this.login = "fail");
+    this.authService.SignIn(this.email, this.password).subscribe(data => {
+      if (data.action == "Success"){
+        localStorage.setItem('userid', data.user_id);
+        localStorage.setItem('id_token', data.token);
+        this.router.navigate(['/main']);
+      } else {
+        this.login = "failed"
+      }
+    })
   }
-
 }

@@ -4,6 +4,7 @@ import User from './user';
 import { AngularFireAuth } from "@angular/fire/auth";
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
 import { HttpClient } from '@angular/common/http';
+import { isNull } from '@angular/compiler/src/output/output_ast';
 @Injectable({
   providedIn: 'root'
 })
@@ -44,22 +45,23 @@ export class AuthenticationService {
 
   // Login in with email/password
   SignIn(email, password) {
-    /*
-    this.http.post<any>("https://trash-talking-mksvgldida-uc.a.run.app/users/login/", JSON.stringify({"email": email, "password": password})).subscribe(data => {
-      console.log(data)
-    });*/
-    return this.ngFireAuth.signInWithEmailAndPassword(email,password)
+    var body = {"email": email, "password": password};
+    return this.http.post<any>("https://trash-talking-mksvgldida-uc.a.run.app/users/login/", body);
   }
 
   // Register user with email/password
-  RegisterUser(email, password, fname, lname, date_joined) {
+  RegisterUser(userid, email, password, fname, lname) {
+    var body = {"user_id": userid, "email": email, "password": password, "first_name": fname, "last_name": lname};
+    console.log(body);
+    return this.http.post<any>("https://trash-talking-mksvgldida-uc.a.run.app/users/new/", body);
+    /*
     var user = new User();
     user.Date_Joined = date_joined;
     user.email = email;
     user.First_name = fname;
     user.Last_name = lname;
     this.userRef.add({ ...user });
-    return this.ngFireAuth.createUserWithEmailAndPassword(email, password)
+    return this.ngFireAuth.createUserWithEmailAndPassword(email, password)*/
   }
 
 }

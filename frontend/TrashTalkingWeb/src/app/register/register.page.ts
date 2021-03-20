@@ -4,19 +4,35 @@ import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-home',
-  templateUrl: 'profile.page.html',
-  styleUrls: ['profile.page.scss'],
+  templateUrl: 'register.page.html',
+  styleUrls: ['register.page.scss'],
 })
-export class ProfilePage {
+export class RegistrationPage {
+  binid: any;
+  register: string = 'success';
+  /*
   entries: any;
   email: string;
   fname: string;
   lname: string;
   date_joined: string;
+  */
 
   constructor(private crudService: GarbageService) {}
 
+  onRegisterBin(){
+    this.crudService.registerBin(this.binid).subscribe(
+      (data) => {
+        this.register = 'success';
+      },
+      (error) => {
+        this.register = 'failed';
+        console.log(error);
+      }
+    );
+  }
   ngOnInit() {
+    /*
     this.crudService.getProfile().subscribe(data => {
       this.email = data.email;
       this.fname = data.first_name;
@@ -24,6 +40,7 @@ export class ProfilePage {
       var date_joined = new Date(data.joined);
       this.date_joined = date_joined.toDateString();
     });
+    */
     /*
     this.crudService.getAllUsers().snapshotChanges().pipe(
       map(changes =>
