@@ -33,20 +33,21 @@
 
     <div id="container" style="padding-top: 300px;">
     <h1>Friend Requests</h1>
-    <p *ngIf="entries == null || entries.length == 0">You have no friend requests currently. Please check back later!</p>
-    <ion-list *ngFor="let entry of entries">
+    <p *ngIf="requests == null || requests.length == 0">You have no friend requests currently. Please check back later!</p>
+    <ion-list *ngFor="let request of requests">
       <ion-item>
         <img src="assets/images/usericon.png" width="30" height="30">
-        <p> {{entry.user1_fname}} {{entry.user1_lname}}</p>
-        <ion-button (click)="confirmFriend(entry)" color="primary">Accept Request</ion-button>
+        <p> {{request.friend}} {{request.request_time}}</p>
+        <ion-button (click)="confirmFriend(request.request_id)" color="primary">Accept Request</ion-button>
+        <ion-button (click)="denyFriend(request.request_id)" color="primary">Deny Request</ion-button>
     </ion-item>
     </ion-list>
     <h1>Friends</h1>
-    <p *ngIf="current == null || current.length == 0">You have no friends currently. Head to the search page to find some users!</p>
-    <ion-list *ngFor="let friend of current">
+    <p *ngIf="friends == null || friends.length == 0">You have no friends currently. Head to the search page to find some users!</p>
+    <ion-list *ngFor="let friend of friends">
       <ion-item>
         <img src="assets/images/usericon.png" width="30" height="30">
-        <p> {{friend.user1_fname}} {{friend.user1_lname}}</p>
+        <p> {{friend.friend}} {{friend.friends_since}}</p>
     </ion-item>
     </ion-list>
   </div>

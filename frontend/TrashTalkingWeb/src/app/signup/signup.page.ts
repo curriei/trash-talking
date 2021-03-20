@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { AuthenticationService } from '../authentication-service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-home',
@@ -8,16 +9,24 @@ import { AuthenticationService } from '../authentication-service';
 })
 export class SignUpPage {
   email: string;
+  uname: string;
   password: string;
   fname: string;
   lname: string;
+  status: string = 'success';
 
-  constructor(private authService: AuthenticationService) {}
+  constructor(private authService: AuthenticationService, private router: Router) {}
 
   onSignUp() {
     console.log(this.email);
     console.log(this.password);
-    this.authService.RegisterUser(this.email, this.password, this.fname, this.lname, "November 23rd, 2020")
+    this.authService.RegisterUser(this.uname, this.email, this.password, this.fname, this.lname).subscribe(data => {
+      if (data.action == "Success"){
+        this.router.navigate(['/home'])
+      } else {
+        this.status = "failed"
+      }
+    })
   }
 
 }

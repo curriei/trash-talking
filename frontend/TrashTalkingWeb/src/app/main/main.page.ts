@@ -77,7 +77,6 @@ export class MainPage {
         { name: "Thur", value: 3 },
         { name: "Fri", value: 2 }
       ];
-      console.log(this.results);
     }
 
     if (val=="week") {

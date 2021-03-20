@@ -9,6 +9,9 @@ import { map } from 'rxjs/operators';
 })
 export class GoalsPage {
   goals: any = null;
+  importance: string;
+  target: string;
+  category: string;
   desc: string;
   duedate: any;
   month = [
@@ -28,6 +31,15 @@ export class GoalsPage {
   constructor(private crudservice: GarbageService) {}
 
   ngOnInit() {
+    this.crudservice.getGoals().subscribe(data => {
+      var goal_list = [];
+      Object.keys(data["goals"]).forEach(function(key) {
+          var goal = data["goals"][key];
+          goal_list.push(goal);
+       });
+      this.goals = goal_list;
+    });
+    /*
     this.crudservice.getAllGoals().snapshotChanges().pipe(
       map(changes =>
         changes.map(c =>
@@ -42,10 +54,16 @@ export class GoalsPage {
         }
       }
       console.log(this.goals);
-    });
-  }
+    });*/
 
+  }
+  
   onAddGoal() {
+    var militime = new Date(this.duedate).getTime();
+    this.crudservice.createGoal(militime, this.importance, this.target, this.category).subscribe(data => {
+      console.log(data);
+    });
+    /*
     var newdate = new Date(this.duedate);
     var fulldate = this.month[newdate.getMonth()] + " " + newdate.getDate() + ", " + newdate.getFullYear();
     this.crudservice.createGoal("0", this.desc, fulldate);
@@ -64,5 +82,6 @@ export class GoalsPage {
       }
       console.log(this.goals);
     });
+    */
   }
 }

@@ -35,9 +35,30 @@
     <div id="container">
     <strong>Goals</strong>
     <ion-item>
-    <ion-label>Goal Description</ion-label>
-    <ion-input [(ngModel)]="desc" placeholder="I want to reduce trash weight by 5 lbs"></ion-input>
+      <ion-label>Priority</ion-label>
+      <ion-select placeholder="Select One" [(ngModel)]="importance">
+        <ion-select-option value="1">High Priority</ion-select-option>
+        <ion-select-option value="2">Medium Priority</ion-select-option>
+        <ion-select-option value="2">High Priority</ion-select-option>
+      </ion-select>
     </ion-item>
+    <ion-item>
+      <ion-label>Goal Category</ion-label>
+      <ion-select placeholder="Select One" [(ngModel)]="category">
+        <ion-select-option value="total_volume">Total Volume</ion-select-option>
+        <ion-select-option value="total_weight">Total Weight</ion-select-option>
+        <ion-select-option value="max_weight_per_week">Max Weight (Week)</ion-select-option>
+        <ion-select-option value="max_volume_per_week">Max Volume (Week)</ion-select-option>
+        <ion-select-option value="max_weight_per_month">Max Weight (Month)</ion-select-option>
+        <ion-select-option value="max_volume_per_month">Max Volume (Month)</ion-select-option>
+        <ion-select-option value="ave_volume_per_day">Avg Volume (Day)</ion-select-option>
+        <ion-select-option value="ave_volume_per_week">Avg Volume (Week)</ion-select-option>
+      </ion-select>
+    </ion-item>
+    <ion-item>
+      <ion-label>Target Value</ion-label>
+      <ion-input [(ngModel)]="target" placeholder="5"></ion-input>
+      </ion-item>
     <ion-item>
       <ion-label>Due Date</ion-label>
       <ion-datetime [(ngModel)]="duedate"></ion-datetime>
@@ -47,7 +68,7 @@
     <p *ngIf="goals == null || goals.length == 0">You haven't set any goals yet.</p>
     <ion-list *ngFor="let goal of goals">
       <ion-item>
-        {{goal.goal}}, {{goal.date}}
+        {{goal.category}}, {{goal.importance}}
     </ion-item>
     </ion-list>
   </div>

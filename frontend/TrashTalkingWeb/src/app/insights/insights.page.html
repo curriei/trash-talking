@@ -33,12 +33,11 @@
     <div id="container">
     <h1>Insights</h1>
     <h2>A selection of insights based on your recent activity.</h2>
-    <ion-list *ngFor="let entry of entries">
+    <ion-list *ngFor="let insight of insights">
       <ion-item>
         <div>
-        <h3>{{entry.Title}}<br></h3>
-        <p>{{entry.Desc}}</p>
-        <a href={{entry.link}}>Link</a>
+        <h3>New Insight!<br></h3>
+        <p>{{insight.text}}</p>
       </div>
     </ion-item>
     </ion-list>
