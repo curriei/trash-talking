@@ -37,7 +37,13 @@
 
  #trashcan-fill {
   display: flex;
-  margin-top: -110px;
+  margin-top: -250px;
+  justify-content: center;
+  align-items: center;
+ }
+
+ #percentCircle {
+  margin-top: -900px;
   justify-content: center;
   align-items: center;
  }
@@ -45,4 +51,5 @@
  ngx-charts-bar-horizontal {
   display: block;
   margin-left: -15%;
+  margin-top: 110px;
 }
