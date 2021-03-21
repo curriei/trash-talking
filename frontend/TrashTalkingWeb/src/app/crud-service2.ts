@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { AngularFirestore, AngularFirestoreCollection } from '@angular/fire/firestore';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import Garbage from './garbage';
 import User from './user';
 import Goal from './goal';
@@ -104,6 +104,38 @@ export class GarbageService {
     console.log(token);
     const headers = {'token': token };
     return this.http.get<any>(url, { headers })
+  }
+
+  createBins() {
+    var url = "https://trash-talking-mksvgldida-uc.a.run.app/bins/create_bin";
+    var body = {
+      "diameter":200,
+      "bin_area":20
+    };
+    var headers = {
+      "admin_password" : "E@tMyA$sD1ckCh3ney"
+    };
+    return this.http.post<any>(url, body, { headers });
+  }
+
+  getGarbage(ts, te, interval : string, bin_id : string) {
+    var body = {
+      'time_start' : ts,
+      'time_end': te,
+      'interval': interval,
+      'bins': bin_id
+    };
+    var token = localStorage.getItem('id_token');
+    const headers = {'token': token }; 
+    return this.http.get<any>("https://trash-talking-mksvgldida-uc.a.run.app/garbage/query", { headers });
+  }
+
+  getCurrentFill(id : string) {
+    console.log(id);
+    var token = localStorage.getItem('id_token');
+    const headers = new HttpHeaders().set('token', token); 
+    const params = new HttpParams().set('bin_id', id);
+    return this.http.get<any>("https://trash-talking-mksvgldida-uc.a.run.app/bins/current", {headers: headers, observe : "body", params: params});
   }
 
   getAll(): AngularFirestoreCollection<Garbage> {
